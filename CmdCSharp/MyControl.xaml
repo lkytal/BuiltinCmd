@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="Lx.CmdCSharp.MyControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"			 
+			 xmlns:vsp="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+			 Background="{DynamicResource VsBrush.ToolboxBackgroundKey}"
+			 Foreground="{DynamicResource VsBrush.ToolWindowTextKey}"
+			 mc:Ignorable="d"
+			 d:DesignHeight="250" d:DesignWidth="800"
+			 Loaded="OnLoad"
+			 Name="MyToolWindow">
+	<Grid Background="{DynamicResource VsBrush.ToolboxBackgroundKey}">
+		<Grid.RowDefinitions>
+			<RowDefinition  Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<TextBox Grid.Row="0" x:Name="Rst" TextWrapping="Wrap" Margin="5,5,5,0"
+			AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+			Background="{DynamicResource VsBrush.ToolWindowBackgroundKey}"
+			FontFamily="Consolas" IsReadOnly="True"></TextBox>
+		<TextBox Grid.Row="1" x:Name="CmdLine" Margin="5" PreviewKeyDown="OnKeyDown"></TextBox>
+	</Grid>
+</UserControl>

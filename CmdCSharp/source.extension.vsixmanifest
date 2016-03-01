@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+	<Metadata>
+		<Identity Id="5f1a1460-a418-4fae-9cad-ff1c76b7aed9" Version="1.1" Language="en-US" Publisher="Lkytal" />
+		<DisplayName>BuildinCmd</DisplayName>
+		<Description xml:space="preserve">Build-in Cmd window for VS2013 and VS2015</Description>
+		<Icon>icon.png</Icon>
+		<PreviewImage>screenshot.png</PreviewImage>
+		<Tags>Cmd, Command line, Console</Tags>
+	</Metadata>
+	<Installation InstalledByMsi="false">
+		<InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0, 14.0]" />
+	</Installation>
+	<Dependencies>
+		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+		<Dependency Id="Microsoft.VisualStudio.MPF.12.0" DisplayName="Visual Studio MPF 12.0" d:Source="Installed" Version="[11.0, 14.0]" />
+	</Dependencies>
+	<PreviewImage>ScreenShot.png</PreviewImage>
+	<Assets>
+		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+	</Assets>
+</PackageManifest>
