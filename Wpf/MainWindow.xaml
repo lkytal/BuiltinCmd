@@ -10,6 +10,7 @@
 		</Grid.RowDefinitions>
 		<TextBox Grid.Row="0" x:Name="Rst" TextWrapping="Wrap" Margin="10"
 				 AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+				 Background="Black" Foreground="White"
 				 FontFamily="Consolas" PreviewKeyDown="OnText"></TextBox>
 	</Grid>
 </Window>

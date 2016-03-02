@@ -27,22 +27,43 @@ namespace Wpf
 			Rst.BorderThickness = new Thickness(0, 0, 0, 0);
 			this.Closing += (s, e) =>
 			{
-				CancelToken.Cancel();
 				Proc.Kill();
-				ReadThread.Wait();
-				ErrThread.Wait();
 			};
 		}
 
+		private bool MDisposed = false;
+
+		~MainWindow()
+		{
+			Dispose(false);
+		}
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!MDisposed)
+			{
+				if (disposing)
+				{
+					ReadThread.Dispose();
+					ErrThread.Dispose();
+				}
+				// free native resources 
+
+				MDisposed = true;
+			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
 		private Process Proc = null;
-		private Task ReadThread = null, ErrThread = null;
+		private Timer ReadThread = null, ErrThread = null;
 		private int RstLen = 0;
-		CancellationTokenSource CancelToken = null;
 
 		private void Init()
 		{
-			CancelToken = new CancellationTokenSource();
-
 			ProcessStartInfo ProArgs = new ProcessStartInfo("cmd.exe");
 			ProArgs.CreateNoWindow = true;
 			ProArgs.RedirectStandardOutput = true;
@@ -53,90 +74,76 @@ namespace Wpf
 			Proc = Process.Start(ProArgs);
 			Proc.EnableRaisingEvents = true;
 
-			ReadThread = new Task(() => ReadRoutine(CancelToken));  
-			ReadThread.Start();
-			ErrThread = new Task(() => ErrorRoutine(CancelToken)); 
-			ErrThread.Start();
+			ReadThread = new Timer(ReadRoutine, null, 500, 10);
+			ErrThread = new Timer(ErrorRoutine, null, 500, 10);
 
 			Proc.Exited += (sender, e) =>
 			{
-				CancelToken.Cancel();
-				ReadThread.Wait();
-				ErrThread.Wait();
+				ReadThread.Dispose();
+				ErrThread.Dispose();
 				Init();
 			};
 			
 		}
 
-		private void ReadRoutine(CancellationTokenSource cancelToken)
+		private void AddData(StringBuilder txt)
 		{
-			StreamReader Output = Proc.StandardOutput;
-			char[] Data = new char[4096];
-
-			while (!cancelToken.Token.IsCancellationRequested)
+			Action Act = () =>
 			{
-				try
+				Rst.AppendText(txt.ToString());
+				RstLen = Rst.Text.Length;
+				Rst.Select(RstLen, 0);
+			};
+
+			this.Dispatcher.BeginInvoke(Act);
+		}
+		private void ReadRoutine(object param)
+		{
+			try
+			{
+				StreamReader Output = Proc.StandardOutput;
+				char[] Data = new char[4096];
+
+				if (Output.Peek() == -1)
 				{
-					if (Output.Peek() == -1)
-					{
-						Output.DiscardBufferedData();
-						Thread.SpinWait(50);
-						continue;
-					}
-
-					int Len = Output.Read(Data, 0, 4096);
-					StringBuilder Str = new StringBuilder();
-					Str.Append(Data, 0, Len);
-
-					Action Act = () =>
-					{
-						Rst.AppendText(Str.ToString());
-						RstLen = Rst.Text.Length;
-						Rst.Select(RstLen, 0);
-					};
-
-					this.Dispatcher.Invoke(Act);
+					Output.DiscardBufferedData();
+					return;
 				}
-				catch (Exception e)
-				{
-					//MessageBox.Show(e.Message);
-				}
+
+				int Len = Output.Read(Data, 0, 4096);
+				StringBuilder Str = new StringBuilder();
+				Str.Append(Data, 0, Len);
+
+				AddData(Str);
+			}
+			catch (Exception e)
+			{
+				//MessageBox.Show(e.Message);
 			}
 		}
 
-		private void ErrorRoutine(CancellationTokenSource cancelToken)
+		private void ErrorRoutine(object param)
 		{
-			StreamReader Err = Proc.StandardError;
-			char[] Data = new char[4096];
-
-			while (!cancelToken.Token.IsCancellationRequested)
+			try
 			{
-				try
+				StreamReader Err = Proc.StandardError;
+				char[] Data = new char[4096];
+
+				if (Err.Peek() == -1)
 				{
-					if (Err.Peek() == -1)
-					{
-						Err.DiscardBufferedData();
-						Thread.SpinWait(50);
-						continue;
-					}
-
-					int Len = Err.Read(Data, 0, 4096);
-					StringBuilder Str = new StringBuilder();
-					Str.Append(Data, 0, Len);
-
-					Action Act = () =>
-					{
-						Rst.AppendText(Str.ToString());
-						RstLen = Rst.Text.Length;
-						Rst.Select(RstLen, 0);
-					};
-
-					this.Dispatcher.Invoke(Act);
+					Err.DiscardBufferedData();
+					return;
 				}
-				catch (Exception e)
-				{
-					//MessageBox.Show(e.Message);
-				}
+
+				int Len = Err.Read(Data, 0, 4096);
+				StringBuilder Str = new StringBuilder();
+				Str.Append(Data, 0, Len);
+
+				AddData(Str);
+			}
+			catch (Exception e)
+			{
+				//MessageBox.Show(e.Message);
 			}
 		}
 
