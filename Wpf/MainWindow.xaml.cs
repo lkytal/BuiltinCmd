@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -25,26 +26,31 @@ namespace Wpf
 			InitializeComponent();
 
 			Rst.BorderThickness = new Thickness(0, 0, 0, 0);
+
 			this.Closing += (s, e) =>
 			{
+				CancelToken.Cancel();
 				Proc.Kill();
+				OutputTask.Wait();
+				ErrorTask.Wait();
 			};
 		}
-
-		private bool MDisposed = false;
-
+		
 		~MainWindow()
 		{
 			Dispose(false);
 		}
+
+		private bool MDisposed = false;
+
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "ErrorTask"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "OutputTask")]
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!MDisposed)
 			{
 				if (disposing)
 				{
-					ReadThread.Dispose();
-					ErrThread.Dispose();
+					CancelToken.Dispose();
 				}
 				// free native resources 
 
@@ -58,12 +64,15 @@ namespace Wpf
 			GC.SuppressFinalize(this);
 		}
 
-		private Process Proc = null;
-		private Timer ReadThread = null, ErrThread = null;
+		private Process Proc;
+		private Task OutputTask = null, ErrorTask = null;
 		private int RstLen = 0;
+		CancellationTokenSource CancelToken = null;
 
 		private void Init()
 		{
+			CancelToken = new CancellationTokenSource();
+
 			ProcessStartInfo ProArgs = new ProcessStartInfo("cmd.exe");
 			ProArgs.CreateNoWindow = true;
 			ProArgs.RedirectStandardOutput = true;
@@ -74,76 +83,102 @@ namespace Wpf
 			Proc = Process.Start(ProArgs);
 			Proc.EnableRaisingEvents = true;
 
-			ReadThread = new Timer(ReadRoutine, null, 500, 10);
-			ErrThread = new Timer(ErrorRoutine, null, 500, 10);
+			OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
+			OutputTask.Start();
+			ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
+			ErrorTask.Start();
 
-			Proc.Exited += (sender, e) =>
-			{
-				ReadThread.Dispose();
-				ErrThread.Dispose();
-				Init();
-			};
-			
+			Proc.Exited += (sender, e) => Restart();
 		}
 
-		private void AddData(StringBuilder txt)
+		private void Restart()
+		{
+			CancelToken.Cancel();
+			OutputTask.Wait();
+			ErrorTask.Wait();
+			CancelToken.Dispose();
+			Init();
+		}
+
+		private void AddData(String outputs)
 		{
 			Action Act = () =>
 			{
-				Rst.AppendText(txt.ToString());
+				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
 				Rst.Select(RstLen, 0);
 			};
 
 			this.Dispatcher.BeginInvoke(Act);
 		}
-		private void ReadRoutine(object param)
+
+		private bool CmdRepl = false;
+		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
 		{
-			try
-			{
-				StreamReader Output = Proc.StandardOutput;
-				char[] Data = new char[4096];
+			char[] Data = new char[4096];
 
-				if (Output.Peek() == -1)
+			while (!cancelToken.Token.IsCancellationRequested)
+			{
+				try
 				{
-					Output.DiscardBufferedData();
-					return;
+					if (output.Peek() == -1)
+					{
+						output.DiscardBufferedData();
+						Thread.Sleep(50);
+						continue;
+					}
+
+					int Len = output.Read(Data, 0, 4096);
+
+					StringBuilder Str = new StringBuilder();
+					Str.Append(Data, 0, Len);
+
+					String Outputs = Str.ToString();
+
+					if (CmdRepl)
+					{
+						CmdRepl = false;
+						Outputs = Outputs.Substring(Outputs.IndexOf('\n'));
+					}
+
+					AddData(Outputs);
 				}
-
-				int Len = Output.Read(Data, 0, 4096);
-				StringBuilder Str = new StringBuilder();
-				Str.Append(Data, 0, Len);
-
-				AddData(Str);
-			}
-			catch (Exception e)
-			{
-				//MessageBox.Show(e.Message);
+				catch (IOException)
+				{
+					return; //Proc terminated
+				}
 			}
 		}
-
-		private void ErrorRoutine(object param)
+		
+		private void OnClear(object sender, EventArgs e)
 		{
-			try
+			Rst.Text = "";
+			Proc.StandardInput.WriteLine("");
+		}
+		private void OnRestart(object sender, EventArgs e)
+		{
+			Proc.Kill();
+			Rst.Text = "";
+			Restart();
+		}
+
+		private void OnSave(object sender, EventArgs e)
+		{
+			SaveFileDialog SaveDlg = new SaveFileDialog();
+			SaveDlg.Filter = "txt文件|*.txt|所有文件|*.*";
+			SaveDlg.FilterIndex = 2;
+			SaveDlg.RestoreDirectory = true;
+			SaveDlg.DefaultExt = ".txt";
+			SaveDlg.AddExtension = true;
+			SaveDlg.Title = "Save Cmd Results";
+
+			if (SaveDlg.ShowDialog() == true)
 			{
-				StreamReader Err = Proc.StandardError;
-				char[] Data = new char[4096];
-
-				if (Err.Peek() == -1)
-				{
-					Err.DiscardBufferedData();
-					return;
-				}
-
-				int Len = Err.Read(Data, 0, 4096);
-				StringBuilder Str = new StringBuilder();
-				Str.Append(Data, 0, Len);
-
-				AddData(Str);
-			}
-			catch (Exception e)
-			{
-				//MessageBox.Show(e.Message);
+				FileStream SaveStream = new FileStream(SaveDlg.FileName, FileMode.Create);
+				byte[] Data = new UTF8Encoding().GetBytes(this.Rst.Text);
+				SaveStream.Write(Data, 0, Data.Length);
+				SaveStream.Flush();
+				SaveStream.Close();
 			}
 		}
 
@@ -197,12 +232,17 @@ namespace Wpf
 				
 				e.Handled = true;
 			}
+			else if (e.Key == Key.Tab)
+			{
+				e.Handled = true;
+			}
 			else if (e.Key == Key.Return)
 			{
 				string Cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-				Rst.Text = Rst.Text.Substring(0, RstLen);
 
+				CmdRepl = true;
 				Proc.StandardInput.WriteLine(Cmd);
+
 				PreCmd.Add(Cmd);
 				CmdPos = PreCmd.Count - 1;
 				e.Handled = true;

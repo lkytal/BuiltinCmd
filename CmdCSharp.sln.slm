@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SolutionLoadInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ActiveProfileName>&lt;Active Profile&gt;</ActiveProfileName>
+  <Profiles>
+    <SolutionLoadProfile>
+      <ProfileName>&lt;Active Profile&gt;</ProfileName>
+      <Projects>
+        <ProjectLoadInfo>
+          <ProjectGuid>01a8246a-55c1-4394-8b90-b014c7110382</ProjectGuid>
+          <LoadPriority>DemandLoad</LoadPriority>
+        </ProjectLoadInfo>
+        <ProjectLoadInfo>
+          <ProjectGuid>41cfb2b7-9487-4d2a-9de8-fde463f06e37</ProjectGuid>
+          <LoadPriority>BackgroundLoad</LoadPriority>
+        </ProjectLoadInfo>
+        <ProjectLoadInfo>
+          <ProjectGuid>8b19eb7a-e396-412a-91b8-4e738fc05116</ProjectGuid>
+          <LoadPriority>DemandLoad</LoadPriority>
+        </ProjectLoadInfo>
+      </Projects>
+    </SolutionLoadProfile>
+  </Profiles>
+</SolutionLoadInfo>

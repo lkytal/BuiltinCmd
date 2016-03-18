@@ -36,16 +36,18 @@ namespace Lx.CmdCSharp
 
 		private bool MDisposed = false;
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "ErrorTask"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "OutputTask")]
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!MDisposed)
 			{
 				if (disposing)
 				{
+					CancelToken.Cancel();
 					Proc.Kill();
-					CancelToken.Dispose();
 					OutputTask.Wait();
 					ErrorTask.Wait();
+					CancelToken.Dispose();
 				}
 				// free native resources 
 
@@ -83,16 +85,32 @@ namespace Lx.CmdCSharp
 			ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
 			ErrorTask.Start();
 
-			Proc.Exited += (sender, e) =>
+			Proc.Exited += (sender, e) => Restart();
+		}
+
+		private void Restart()
+		{
+			CancelToken.Cancel();
+			OutputTask.Wait();
+			ErrorTask.Wait();
+			CancelToken.Dispose();
+			Init();
+		}
+
+		private void AddData(String outputs)
+		{
+			Action Act = () =>
 			{
-				CancelToken.Cancel();
-				OutputTask.Wait();
-				ErrorTask.Wait();
-				CancelToken.Dispose();
-				Init();
+				Rst.AppendText(outputs);
+				RstLen = Rst.Text.Length;
+				Rst.Select(RstLen, 0);
+				Rst.ScrollToEnd();
 			};
 
+			this.Dispatcher.BeginInvoke(Act);
 		}
+
+		private bool CmdRepl = false;
 
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
 		{
@@ -105,7 +123,7 @@ namespace Lx.CmdCSharp
 					if (output.Peek() == -1)
 					{
 						output.DiscardBufferedData();
-						Thread.SpinWait(50);
+						Thread.Sleep(50);
 						continue;
 					}
 
@@ -113,19 +131,22 @@ namespace Lx.CmdCSharp
 					StringBuilder Str = new StringBuilder();
 					Str.Append(Data, 0, Len);
 
-					Action Act = () =>
-					{
-						Rst.AppendText(Str.ToString());
-						RstLen = Rst.Text.Length;
-						Rst.ScrollToEnd();
-						Rst.Select(RstLen, 0);
-					};
+					String Outputs = Str.ToString();
 
-					this.Dispatcher.BeginInvoke(Act);
+					if (CmdRepl)
+					{
+						CmdRepl = false;
+						Outputs = Outputs.Substring(Outputs.IndexOf('\n'));
+					}
+
+					AddData(Outputs);
 				}
-				catch (Exception e)
+				catch (IOException)
 				{
-					//MessageBox.Show(e.Message);
+					if (!cancelToken.Token.IsCancellationRequested)
+					{
+						Proc.Kill();
+					}
 				}
 			}
 		}
@@ -146,36 +167,6 @@ namespace Lx.CmdCSharp
 		private List<string> CmdList = new List<string>();
 		private int CmdPos = -1;
 		
-		private void RunCmd()
-		{
-			Proc.StandardInput.WriteLine(CmdLine.Text);
-			CmdList.Add(CmdLine.Text);
-			CmdPos = CmdList.Count - 1;
-			CmdLine.Text = "";
-		}
-		
-		private void OnKeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.Key == Key.Return)
-			{
-				RunCmd();
-			}
-			else if (e.Key == Key.Up)
-			{
-				if (CmdPos < 0) return;
-				CmdLine.Text = CmdList[CmdPos];
-				CmdPos -= 1;
-				CmdLine.Select(CmdLine.Text.Length, 0);
-			}
-			else if (e.Key == Key.Down)
-			{
-				if (CmdPos >= CmdList.Count - 2) return;
-				CmdPos += 1;
-				CmdLine.Text = CmdList[CmdPos + 1];
-				CmdLine.Select(CmdLine.Text.Length, 0);
-			}
-		}
-
 		private void OnText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
@@ -221,9 +212,10 @@ namespace Lx.CmdCSharp
 			else if (e.Key == Key.Return)
 			{
 				string Cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-				Rst.Text = Rst.Text.Substring(0, RstLen);
 
+				CmdRepl = true;
 				Proc.StandardInput.WriteLine(Cmd);
+
 				CmdList.Add(Cmd);
 				CmdPos = CmdList.Count - 1;
 				e.Handled = true;

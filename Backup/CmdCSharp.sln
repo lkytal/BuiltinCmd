@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmdCSharp", "CmdCSharp\CmdCSharp.csproj", "{01A8246A-55C1-4394-8B90-B014C7110382}"
 EndProject
@@ -10,6 +10,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CmdLine", "CmdLine\CmdLine.vcxproj", "{8B19EB7A-E396-412A-91B8-4E738FC05116}"
 EndProject
 Global
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 9f1af535-b502-4e3e-a119-5807bbb1406c
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -52,8 +55,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(CodealikeProperties) = postSolution
-		SolutionGuid = 9f1af535-b502-4e3e-a119-5807bbb1406c
 	EndGlobalSection
 EndGlobal
