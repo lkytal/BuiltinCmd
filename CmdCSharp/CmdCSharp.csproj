@@ -54,7 +54,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
-    <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>d:\Code\C#\CmdCSharp\CmdCSharp\</CopyVsixExtensionLocation>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>

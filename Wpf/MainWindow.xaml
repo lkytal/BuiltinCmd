@@ -1,10 +1,10 @@
 ﻿<Window x:Class="Wpf.MainWindow"
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:vs="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
-		xmlns:UI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
-		Title="MainWindow" Height="400" Width="700"
-		Loaded="OnLoad">
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:vs="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
+	xmlns:UI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
+	Title="MainWindow" Height="400" Width="700"
+	Loaded="OnLoad">
 	<Window.Resources>
 		<ControlTemplate x:Key="ImgBtn" TargetType="{x:Type Button}">
 			<Button Margin="5" Padding="5" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FFEEEEF2">
@@ -33,7 +33,7 @@
 			<Button Tag="c:\Download\P.ico" Template="{StaticResource ResourceKey=IconBtn}" />
 		</ToolBarPanel>
 		<TextBox Grid.Row="1" x:Name="Rst" TextWrapping="Wrap" Padding="10"
-				 AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
-				 FontFamily="Consolas" PreviewKeyDown="OnText"></TextBox>
+			AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+			FontFamily="Consolas" PreviewKeyDown="OnText"></TextBox>
 	</Grid>
 </Window>

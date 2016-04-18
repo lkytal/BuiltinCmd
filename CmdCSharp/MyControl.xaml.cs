@@ -5,12 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Diagnostics;
 using System.IO;
 //using Microsoft.VisualStudio.Shell;
@@ -49,7 +44,7 @@ namespace Lx.CmdCSharp
 					ErrorTask.Wait();
 					CancelToken.Dispose();
 				}
-				// free native resources 
+				// free native resources
 
 				MDisposed = true;
 			}
@@ -110,6 +105,7 @@ namespace Lx.CmdCSharp
 			this.Dispatcher.BeginInvoke(Act);
 		}
 
+		private object Locker = new object();
 		private bool CmdRepl = false;
 
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
@@ -133,10 +129,13 @@ namespace Lx.CmdCSharp
 
 					String Outputs = Str.ToString();
 
-					if (CmdRepl)
+					lock (Locker)
 					{
-						CmdRepl = false;
-						Outputs = Outputs.Substring(Outputs.IndexOf('\n'));
+						if (CmdRepl)
+						{
+							CmdRepl = false;
+							Outputs = Outputs.Substring(Outputs.IndexOf('\n'));
+						}
 					}
 
 					AddData(Outputs);
@@ -150,7 +149,7 @@ namespace Lx.CmdCSharp
 				}
 			}
 		}
-		
+
 		private bool FirstRun = true;
 
 		private void OnLoad(object sender, EventArgs e)
@@ -166,7 +165,7 @@ namespace Lx.CmdCSharp
 
 		private List<string> CmdList = new List<string>();
 		private int CmdPos = -1;
-		
+
 		private void OnText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
@@ -212,14 +211,37 @@ namespace Lx.CmdCSharp
 			else if (e.Key == Key.Return)
 			{
 				string Cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
+				RunCmd(Cmd);
 
-				CmdRepl = true;
-				Proc.StandardInput.WriteLine(Cmd);
-
-				CmdList.Add(Cmd);
-				CmdPos = CmdList.Count - 1;
 				e.Handled = true;
 			}
+		}
+
+		private void RunCmd(string Cmd)
+		{
+			if (Cmd == "cls")
+			{
+				Action Act = () =>
+				{
+					Rst.Text = "";
+					RstLen = 0;
+
+					Proc.StandardInput.WriteLine("");
+				};
+
+				this.Dispatcher.BeginInvoke(Act);
+			}
+			else
+			{
+				lock (Locker)
+				{
+					CmdRepl = true;
+					Proc.StandardInput.WriteLine(Cmd);
+				}
+			}
+
+			CmdList.Add(Cmd);
+			CmdPos = CmdList.Count - 1;
 		}
 	}
 }
