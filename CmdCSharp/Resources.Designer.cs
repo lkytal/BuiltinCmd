@@ -70,7 +70,7 @@ namespace Lx.CmdCSharp {
         }
         
         /// <summary>
-        ///   查找类似 BuildinCmd 的本地化字符串。
+        ///   查找类似 BuiltinCmd 的本地化字符串。
         /// </summary>
         internal static string ToolWindowTitle {
             get {

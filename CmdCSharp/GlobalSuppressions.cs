@@ -12,4 +12,3 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Arguments", "JustCode_LiteralArgumentIsNotNamedDiagnostic:The used literal argument is not named")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Variable", "JustCode_ImplicitTypedVariableDeclarationMisused:Not implicitly typed local variable")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("TypeFileNameMismatch", "JustCode_CSharp_TypeFileNameMismatch:Types not matching file names")]
-

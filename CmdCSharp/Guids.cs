@@ -4,7 +4,7 @@ using System;
 
 namespace Lx.CmdCSharp
 {
-	static class GuidList
+	internal static class GuidList
 	{
 		public const string guidCmdCSharpPkgString = "5f1a1460-a418-4fae-9cad-ff1c76b7aed9";
 		public const string guidCmdCSharpCmdSetString = "1bcda133-5334-485a-a274-ab679515e8f3";

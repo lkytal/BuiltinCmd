@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.IO;
-//using Microsoft.VisualStudio.Shell;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Lx.CmdCSharp
 {
@@ -57,30 +53,36 @@ namespace Lx.CmdCSharp
 		}
 
 		private Process Proc;
-		private Task OutputTask = null, ErrorTask = null;
+		private System.Threading.Tasks.Task OutputTask = null, ErrorTask = null;
 		private int RstLen = 0;
-		CancellationTokenSource CancelToken = null;
+		public CancellationTokenSource CancelToken = null;
 
 		private void Init()
 		{
 			CancelToken = new CancellationTokenSource();
 
-			ProcessStartInfo ProArgs = new ProcessStartInfo("cmd.exe");
-			ProArgs.CreateNoWindow = true;
-			ProArgs.RedirectStandardOutput = true;
-			ProArgs.RedirectStandardInput = true;
-			ProArgs.RedirectStandardError = true;
-			ProArgs.UseShellExecute = false;
+			ProcessStartInfo proArgs = new ProcessStartInfo("cmd.exe")
+			{
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+				RedirectStandardInput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false
+			};
 
-			Proc = Process.Start(ProArgs);
-			Proc.EnableRaisingEvents = true;
+			Proc = Process.Start(proArgs);
 
-			OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
-			OutputTask.Start();
-			ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
-			ErrorTask.Start();
+			if (Proc != null)
+			{
+				Proc.EnableRaisingEvents = true;
 
-			Proc.Exited += (sender, e) => Restart();
+				OutputTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
+				OutputTask.Start();
+				ErrorTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardError, CancelToken));
+				ErrorTask.Start();
+
+				Proc.Exited += (sender, e) => Restart();
+			}
 		}
 
 		private void Restart()
@@ -94,7 +96,7 @@ namespace Lx.CmdCSharp
 
 		private void AddData(String outputs)
 		{
-			Action Act = () =>
+			Action act = () =>
 			{
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
@@ -102,7 +104,7 @@ namespace Lx.CmdCSharp
 				Rst.ScrollToEnd();
 			};
 
-			this.Dispatcher.BeginInvoke(Act);
+			this.Dispatcher.BeginInvoke(act);
 		}
 
 		private object Locker = new object();
@@ -110,7 +112,7 @@ namespace Lx.CmdCSharp
 
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
 		{
-			char[] Data = new char[4096];
+			char[] data = new char[4096];
 
 			while (!cancelToken.Token.IsCancellationRequested)
 			{
@@ -123,22 +125,22 @@ namespace Lx.CmdCSharp
 						continue;
 					}
 
-					int Len = output.Read(Data, 0, 4096);
-					StringBuilder Str = new StringBuilder();
-					Str.Append(Data, 0, Len);
+					int len = output.Read(data, 0, 4096);
+					StringBuilder str = new StringBuilder();
+					str.Append(data, 0, len);
 
-					String Outputs = Str.ToString();
+					String outputs = str.ToString();
 
 					lock (Locker)
 					{
 						if (CmdRepl)
 						{
 							CmdRepl = false;
-							Outputs = Outputs.Substring(Outputs.IndexOf('\n'));
+							outputs = outputs.Substring(outputs.IndexOf('\n'));
 						}
 					}
 
-					AddData(Outputs);
+					AddData(outputs);
 				}
 				catch (IOException)
 				{
@@ -159,7 +161,10 @@ namespace Lx.CmdCSharp
 				FirstRun = false;
 				Rst.BorderThickness = new Thickness(0, 0, 0, 0);
 
-				new Task(() => Init()).Start();
+				EnvDTE.DTEEvents eventsObj = CmdCSharpPackage.Dte.Events.DTEEvents;
+				eventsObj.OnBeginShutdown += ShutDown;
+
+				new System.Threading.Tasks.Task(Init).Start();
 			}
 		}
 
@@ -182,7 +187,7 @@ namespace Lx.CmdCSharp
 
 			if (Rst.CaretIndex < RstLen)
 			{
-				Rst.CaretIndex = RstLen;
+				Rst.CaretIndex = Rst.Text.Length; //RstLen;
 				return;
 			}
 
@@ -208,10 +213,14 @@ namespace Lx.CmdCSharp
 
 				e.Handled = true;
 			}
+			else if (e.Key == Key.Tab)
+			{
+				e.Handled = true;
+			}
 			else if (e.Key == Key.Return)
 			{
-				string Cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-				RunCmd(Cmd);
+				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
+				RunCmd(cmd);
 
 				e.Handled = true;
 			}
@@ -221,7 +230,7 @@ namespace Lx.CmdCSharp
 		{
 			if (Cmd == "cls")
 			{
-				Action Act = () =>
+				Action act = () =>
 				{
 					Rst.Text = "";
 					RstLen = 0;
@@ -229,7 +238,7 @@ namespace Lx.CmdCSharp
 					Proc.StandardInput.WriteLine("");
 				};
 
-				this.Dispatcher.BeginInvoke(Act);
+				this.Dispatcher.BeginInvoke(act);
 			}
 			else
 			{
@@ -242,6 +251,11 @@ namespace Lx.CmdCSharp
 
 			CmdList.Add(Cmd);
 			CmdPos = CmdList.Count - 1;
+		}
+
+		private void ShutDown()
+		{
+			Dispose(true);
 		}
 	}
 }

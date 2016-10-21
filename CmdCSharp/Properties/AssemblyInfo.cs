@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BuildinCmd")]
-[assembly: AssemblyDescription("Build in Cmd windows for VS2013 and VS2015")]
+[assembly: AssemblyTitle("BuiltinCmd")]
+[assembly: AssemblyDescription("Built-in Cmd windows for VS2013 and VS2015")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Lx")]
-[assembly: AssemblyProduct("BuildinCmd")]
+[assembly: AssemblyProduct("BuiltinCmd")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]   
