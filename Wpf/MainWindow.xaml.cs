@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Win32;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Media;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.IO;
@@ -35,7 +30,7 @@ namespace Wpf
 				ErrorTask.Wait();
 			};
 		}
-		
+
 		~MainWindow()
 		{
 			Dispose(false);
@@ -52,7 +47,7 @@ namespace Wpf
 				{
 					CancelToken.Dispose();
 				}
-				// free native resources 
+				// free native resources
 
 				MDisposed = true;
 			}
@@ -73,22 +68,27 @@ namespace Wpf
 		{
 			CancelToken = new CancellationTokenSource();
 
-			ProcessStartInfo ProArgs = new ProcessStartInfo("cmd.exe");
-			ProArgs.CreateNoWindow = true;
-			ProArgs.RedirectStandardOutput = true;
-			ProArgs.RedirectStandardInput = true;
-			ProArgs.RedirectStandardError = true;
-			ProArgs.UseShellExecute = false;
+			ProcessStartInfo proArgs = new ProcessStartInfo("cmd.exe")
+			{
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+				RedirectStandardInput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false
+			};
 
-			Proc = Process.Start(ProArgs);
-			Proc.EnableRaisingEvents = true;
+			Proc = Process.Start(proArgs);
+			if (Proc != null)
+			{
+				Proc.EnableRaisingEvents = true;
 
-			OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
-			OutputTask.Start();
-			ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
-			ErrorTask.Start();
+				OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
+				OutputTask.Start();
+				ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
+				ErrorTask.Start();
 
-			Proc.Exited += (sender, e) => Restart();
+				Proc.Exited += (sender, e) => Restart();
+			}
 		}
 
 		private void Restart()
@@ -149,7 +149,7 @@ namespace Wpf
 				}
 			}
 		}
-		
+
 		private void OnClear(object sender, EventArgs e)
 		{
 			Rst.Text = "";
@@ -164,21 +164,23 @@ namespace Wpf
 
 		private void OnSave(object sender, EventArgs e)
 		{
-			SaveFileDialog SaveDlg = new SaveFileDialog();
-			SaveDlg.Filter = "txt文件|*.txt|所有文件|*.*";
-			SaveDlg.FilterIndex = 2;
-			SaveDlg.RestoreDirectory = true;
-			SaveDlg.DefaultExt = ".txt";
-			SaveDlg.AddExtension = true;
-			SaveDlg.Title = "Save Cmd Results";
-
-			if (SaveDlg.ShowDialog() == true)
+			SaveFileDialog saveDlg = new SaveFileDialog
 			{
-				FileStream SaveStream = new FileStream(SaveDlg.FileName, FileMode.Create);
-				byte[] Data = new UTF8Encoding().GetBytes(this.Rst.Text);
-				SaveStream.Write(Data, 0, Data.Length);
-				SaveStream.Flush();
-				SaveStream.Close();
+				Filter = "txt文件|*.txt|所有文件|*.*",
+				FilterIndex = 2,
+				RestoreDirectory = true,
+				DefaultExt = ".txt",
+				AddExtension = true,
+				Title = "Save Cmd Results"
+			};
+
+			if (saveDlg.ShowDialog() == true)
+			{
+				FileStream saveStream = new FileStream(saveDlg.FileName, FileMode.Create);
+				byte[] data = new UTF8Encoding().GetBytes(this.Rst.Text);
+				saveStream.Write(data, 0, data.Length);
+				saveStream.Flush();
+				saveStream.Close();
 			}
 		}
 
@@ -203,7 +205,7 @@ namespace Wpf
 				e.Handled = true;
 				return;
 			}
-						
+
 			if (Rst.CaretIndex < RstLen)
 			{
 				Rst.CaretIndex = RstLen;
@@ -218,7 +220,7 @@ namespace Wpf
 					CmdPos -= 1;
 					Rst.Select(Rst.Text.Length, 0);
 				}
-				
+
 				e.Handled = true;
 			}
 			else if (e.Key == Key.Down)
@@ -229,7 +231,7 @@ namespace Wpf
 					Rst.Text = Rst.Text.Substring(0, RstLen) + PreCmd[CmdPos];
 					Rst.Select(Rst.Text.Length, 0);
 				}
-				
+
 				e.Handled = true;
 			}
 			else if (e.Key == Key.Tab)

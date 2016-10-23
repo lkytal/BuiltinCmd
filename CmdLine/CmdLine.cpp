@@ -49,7 +49,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	WCHAR ExeFile[1024] = L"cmd.exe";
 	CreateProcess(NULL, ExeFile, NULL, NULL, TRUE, 0, NULL, NULL, &StartInfo, &ProcInfo);
-	
+
 	char command[1024];
 
 	DWORD rt;

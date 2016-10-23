@@ -94,7 +94,7 @@ namespace Lx.CmdCSharp
 			Init();
 		}
 
-		private void AddData(String outputs)
+		private void AddData(string outputs)
 		{
 			Action act = () =>
 			{
@@ -129,7 +129,7 @@ namespace Lx.CmdCSharp
 					StringBuilder str = new StringBuilder();
 					str.Append(data, 0, len);
 
-					String outputs = str.ToString();
+					string outputs = str.ToString();
 
 					lock (Locker)
 					{
@@ -244,6 +244,7 @@ namespace Lx.CmdCSharp
 			{
 				lock (Locker)
 				{
+					RstLen = Rst.Text.Length; //protect input texts
 					CmdRepl = true;
 					Proc.StandardInput.WriteLine(Cmd);
 				}

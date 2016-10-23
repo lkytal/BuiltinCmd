@@ -7,7 +7,7 @@
 		Background="{DynamicResource VsBrush.ToolWindowBackgroundKey}"
 		Foreground="{DynamicResource VsBrush.WindowText}"
 		mc:Ignorable="d"
-		d:DesignHeight="280" d:DesignWidth="800"
+		d:DesignHeight="300" d:DesignWidth="700"
 		Loaded="OnLoad"
 		Name="MyToolWindow">
 	<UserControl.Resources>
