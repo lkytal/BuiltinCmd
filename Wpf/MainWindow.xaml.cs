@@ -107,7 +107,7 @@ namespace Wpf
 			{
 				string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
 
-				if (Regex.IsMatch(lastLine, @"^\w:\\\S+>$"))
+				if (Regex.IsMatch(lastLine, @"^\w:\\\S*>$"))
 				{
 					dir = lastLine.Substring(0, lastLine.Length - 1);
 				}
@@ -205,6 +205,8 @@ namespace Wpf
 			}
 			else if (e.Key == Key.Tab)
 			{
+				e.Handled = true;
+
 				if (inputed)
 				{
 					tabIndex = 0;
@@ -223,7 +225,12 @@ namespace Wpf
 
 				try
 				{
-					var files = Directory.GetFiles(dir, tabHit + "*");
+					var files = Directory.GetFileSystemEntries(dir, tabHit + "*");
+
+					if (files.Length == 0)
+					{
+						return; //no match
+					}
 
 					if (tabIndex >= files.Length)
 					{
@@ -239,13 +246,9 @@ namespace Wpf
 				}
 				catch (ArgumentException ex)
 				{
-					if (ex.Message == "")
-					{
-						tabIndex = 0;
-					}
+					Debug.WriteLine(ex);
+					tabIndex = 0;
 				}
-
-				e.Handled = true;
 			}
 			else if (e.Key == Key.Return)
 			{

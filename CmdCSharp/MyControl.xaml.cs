@@ -102,7 +102,7 @@ namespace Lx.CmdCSharp
 			{
 				string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
 
-				if (Regex.IsMatch(lastLine, @"^\w:\\\S+>$"))
+				if (Regex.IsMatch(lastLine, @"^\w:\\\S*>$"))
 				{
 					dir = lastLine.Substring(0, lastLine.Length - 1);
 				}
@@ -222,6 +222,8 @@ namespace Lx.CmdCSharp
 			}
 			else if (e.Key == Key.Tab)
 			{
+				e.Handled = true;
+
 				if (inputed)
 				{
 					tabIndex = 0;
@@ -240,7 +242,12 @@ namespace Lx.CmdCSharp
 
 				try
 				{
-					var files = Directory.GetFiles(dir, tabHit + "*");
+					var files = Directory.GetFileSystemEntries(dir, tabHit + "*");
+
+					if (files.Length == 0)
+					{
+						return; //no match
+					}
 
 					if (tabIndex >= files.Length)
 					{
@@ -256,13 +263,9 @@ namespace Lx.CmdCSharp
 				}
 				catch (ArgumentException ex)
 				{
-					if (ex.Message == "")
-					{
-						tabIndex = 0;
-					}
+					Debug.Write(ex);
+					tabIndex = 0;
 				}
-
-				e.Handled = true;
 			}
 			else if (e.Key == Key.Return)
 			{
