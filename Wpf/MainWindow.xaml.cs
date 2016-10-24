@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Wpf
@@ -62,7 +63,7 @@ namespace Wpf
 		private Process Proc;
 		private Task OutputTask = null, ErrorTask = null;
 		private int RstLen = 0;
-		CancellationTokenSource CancelToken = null;
+		private CancellationTokenSource CancelToken = null;
 
 		private void Init()
 		{
@@ -100,22 +101,31 @@ namespace Wpf
 			Init();
 		}
 
-		private void AddData(String outputs)
+		private void AddData(string outputs)
 		{
-			Action Act = () =>
+			Action act = () =>
 			{
+				string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
+
+				if (Regex.IsMatch(lastLine, @"^\w:\\\S+>$"))
+				{
+					dir = lastLine.Substring(0, lastLine.Length - 1);
+				}
+
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
 				Rst.Select(RstLen, 0);
 			};
 
-			this.Dispatcher.BeginInvoke(Act);
+			this.Dispatcher.BeginInvoke(act);
 		}
 
 		private bool CmdRepl = false;
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
 		{
-			char[] Data = new char[4096];
+			char[] data = new char[4096];
+
+			//TextReader output = TextReader.Synchronized(outputStream);
 
 			while (!cancelToken.Token.IsCancellationRequested)
 			{
@@ -128,25 +138,129 @@ namespace Wpf
 						continue;
 					}
 
-					int Len = output.Read(Data, 0, 4096);
+					int len = output.Read(data, 0, 4096);
 
-					StringBuilder Str = new StringBuilder();
-					Str.Append(Data, 0, Len);
+					StringBuilder str = new StringBuilder();
+					str.Append(data, 0, len);
 
-					String Outputs = Str.ToString();
+					string outputs = str.ToString();
 
 					if (CmdRepl)
 					{
 						CmdRepl = false;
-						Outputs = Outputs.Substring(Outputs.IndexOf('\n'));
+						outputs = outputs.Substring(outputs.IndexOf('\n'));
 					}
 
-					AddData(Outputs);
+					AddData(outputs);
 				}
 				catch (IOException)
 				{
 					return; //Proc terminated
 				}
+			}
+		}
+
+		private List<string> CmdList = new List<string>();
+		private int CmdPos = -1;
+		private int tabIndex = 0;
+		private int tabEnd = 0;
+		private string dir = "";
+		private bool inputed = true;
+
+		private void OnText(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
+			{
+				e.Handled = true;
+			}
+			else if (e.Key == Key.Return && Rst.CaretIndex <= RstLen - 1)
+			{
+				e.Handled = true;
+			}
+			else if (Rst.CaretIndex < RstLen)
+			{
+				Rst.CaretIndex = Rst.Text.Length;
+			}
+			else if (e.Key == Key.Up)
+			{
+				if (CmdPos >= 0)
+				{
+					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
+					CmdPos -= 1;
+					Rst.Select(Rst.Text.Length, 0);
+				}
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.Down)
+			{
+				if (CmdPos < CmdList.Count - 2)
+				{
+					CmdPos += 1;
+					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
+					Rst.Select(Rst.Text.Length, 0);
+				}
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.Tab)
+			{
+				if (inputed)
+				{
+					tabIndex = 0;
+					tabEnd = Rst.Text.Length;
+					inputed = false;
+				}
+
+				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
+
+				int pos = cmd.LastIndexOf('"');
+				if (pos == -1)
+				{
+					pos = cmd.LastIndexOf(' ');
+				}
+				string tabHit = cmd.Substring(pos + 1);
+
+				try
+				{
+					var files = Directory.GetFiles(dir, tabHit + "*");
+
+					if (tabIndex >= files.Length)
+					{
+						tabIndex = 0;
+					}
+
+					Rst.Text = Rst.Text.Remove(tabEnd - tabHit.Length);
+
+					string tabFile = files[tabIndex++];
+					string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);
+					Rst.AppendText(tabName);
+					Rst.Select(Rst.Text.Length, 0);
+				}
+				catch (ArgumentException ex)
+				{
+					if (ex.Message == "")
+					{
+						tabIndex = 0;
+					}
+				}
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.Return)
+			{
+				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
+
+				CmdRepl = true;
+				Proc.StandardInput.WriteLine(cmd);
+
+				CmdList.Add(cmd);
+				CmdPos = CmdList.Count - 1;
+				e.Handled = true;
+			}
+			else
+			{
+				inputed = true;
 			}
 		}
 
@@ -159,7 +273,7 @@ namespace Wpf
 		{
 			Proc.Kill();
 			Rst.Text = "";
-			Restart();
+			//Restart();
 		}
 
 		private void OnSave(object sender, EventArgs e)
@@ -187,68 +301,6 @@ namespace Wpf
 		private void OnLoad(object sender, EventArgs e)
 		{
 			Init();
-		}
-
-		private List<string> PreCmd = new List<string>();
-		private int CmdPos = -1;
-
-		private void OnText(object sender, KeyEventArgs e)
-		{
-			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
-			{
-				e.Handled = true;
-				return;
-			}
-
-			if (e.Key == Key.Return && Rst.CaretIndex <= RstLen - 1)
-			{
-				e.Handled = true;
-				return;
-			}
-
-			if (Rst.CaretIndex < RstLen)
-			{
-				Rst.CaretIndex = RstLen;
-				return;
-			}
-
-			if (e.Key == Key.Up)
-			{
-				if (CmdPos >= 0)
-				{
-					Rst.Text = Rst.Text.Substring(0, RstLen) + PreCmd[CmdPos];
-					CmdPos -= 1;
-					Rst.Select(Rst.Text.Length, 0);
-				}
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Down)
-			{
-				if (CmdPos < PreCmd.Count - 2)
-				{
-					CmdPos += 1;
-					Rst.Text = Rst.Text.Substring(0, RstLen) + PreCmd[CmdPos];
-					Rst.Select(Rst.Text.Length, 0);
-				}
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Tab)
-			{
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Return)
-			{
-				string Cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-
-				CmdRepl = true;
-				Proc.StandardInput.WriteLine(Cmd);
-
-				PreCmd.Add(Cmd);
-				CmdPos = PreCmd.Count - 1;
-				e.Handled = true;
-			}
 		}
 	}
 }

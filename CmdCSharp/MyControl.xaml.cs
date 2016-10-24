@@ -7,6 +7,8 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Microsoft.Win32;
+using System.Text.RegularExpressions;
 
 namespace Lx.CmdCSharp
 {
@@ -98,10 +100,17 @@ namespace Lx.CmdCSharp
 		{
 			Action act = () =>
 			{
+				string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
+
+				if (Regex.IsMatch(lastLine, @"^\w:\\\S+>$"))
+				{
+					dir = lastLine.Substring(0, lastLine.Length - 1);
+				}
+
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
 				Rst.Select(RstLen, 0);
-				Rst.ScrollToEnd();
+				//Rst.ScrollToEnd();
 			};
 
 			this.Dispatcher.BeginInvoke(act);
@@ -170,28 +179,26 @@ namespace Lx.CmdCSharp
 
 		private List<string> CmdList = new List<string>();
 		private int CmdPos = -1;
+		private int tabIndex = 0;
+		private int tabEnd = 0;
+		private string dir = "";
+		private bool inputed = true;
 
 		private void OnText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
 			{
 				e.Handled = true;
-				return;
 			}
-
-			if (e.Key == Key.Return && Rst.CaretIndex <= RstLen - 1)
+			else if (e.Key == Key.Return && Rst.CaretIndex <= RstLen - 1)
 			{
 				e.Handled = true;
-				return;
 			}
-
-			if (Rst.CaretIndex < RstLen)
+			else if (Rst.CaretIndex < RstLen)
 			{
 				Rst.CaretIndex = Rst.Text.Length; //RstLen;
-				return;
 			}
-
-			if (e.Key == Key.Up)
+			else if (e.Key == Key.Up)
 			{
 				if (CmdPos >= 0)
 				{
@@ -215,6 +222,46 @@ namespace Lx.CmdCSharp
 			}
 			else if (e.Key == Key.Tab)
 			{
+				if (inputed)
+				{
+					tabIndex = 0;
+					tabEnd = Rst.Text.Length;
+					inputed = false;
+				}
+
+				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
+
+				int pos = cmd.LastIndexOf('"');
+				if (pos == -1)
+				{
+					pos = cmd.LastIndexOf(' ');
+				}
+				string tabHit = cmd.Substring(pos + 1);
+
+				try
+				{
+					var files = Directory.GetFiles(dir, tabHit + "*");
+
+					if (tabIndex >= files.Length)
+					{
+						tabIndex = 0;
+					}
+
+					Rst.Text = Rst.Text.Remove(tabEnd - tabHit.Length);
+
+					string tabFile = files[tabIndex++];
+					string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);
+					Rst.AppendText(tabName);
+					Rst.Select(Rst.Text.Length, 0);
+				}
+				catch (ArgumentException ex)
+				{
+					if (ex.Message == "")
+					{
+						tabIndex = 0;
+					}
+				}
+
 				e.Handled = true;
 			}
 			else if (e.Key == Key.Return)
@@ -224,11 +271,15 @@ namespace Lx.CmdCSharp
 
 				e.Handled = true;
 			}
+			else
+			{
+				inputed = true;
+			}
 		}
 
-		private void RunCmd(string Cmd)
+		private void RunCmd(string cmd)
 		{
-			if (Cmd == "cls")
+			if (cmd == "cls")
 			{
 				Action act = () =>
 				{
@@ -246,12 +297,48 @@ namespace Lx.CmdCSharp
 				{
 					RstLen = Rst.Text.Length; //protect input texts
 					CmdRepl = true;
-					Proc.StandardInput.WriteLine(Cmd);
+					Proc.StandardInput.WriteLine(cmd);
 				}
 			}
 
-			CmdList.Add(Cmd);
+			CmdList.Add(cmd);
 			CmdPos = CmdList.Count - 1;
+		}
+
+		private void OnClear(object sender, EventArgs e)
+		{
+			Rst.Text = "";
+			RstLen = 0;
+			Proc.StandardInput.WriteLine("");
+		}
+		private void OnRestart(object sender, EventArgs e)
+		{
+			Proc.Kill();
+			Rst.Text = "";
+			RstLen = 0;
+			//Restart();
+		}
+
+		private void OnSave(object sender, EventArgs e)
+		{
+			SaveFileDialog saveDlg = new SaveFileDialog
+			{
+				Filter = "txt文件|*.txt|所有文件|*.*",
+				FilterIndex = 2,
+				RestoreDirectory = true,
+				DefaultExt = ".txt",
+				AddExtension = true,
+				Title = "Save Cmd Results"
+			};
+
+			if (saveDlg.ShowDialog() == true)
+			{
+				FileStream saveStream = new FileStream(saveDlg.FileName, FileMode.Create);
+				byte[] data = new UTF8Encoding().GetBytes(Rst.Text);
+				saveStream.Write(data, 0, data.Length);
+				saveStream.Flush();
+				saveStream.Close();
+			}
 		}
 
 		private void ShutDown()

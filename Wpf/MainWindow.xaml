@@ -1,26 +1,21 @@
 ﻿<Window x:Class="Wpf.MainWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:vs="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
-	xmlns:UI="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
-	Title="MainWindow" Height="400" Width="700"
+	Title="MainWindow" Height="400" Width="600"
 	Loaded="OnLoad">
 	<Window.Resources>
-		<ControlTemplate x:Key="ImgBtn" TargetType="{x:Type Button}">
-			<Button Margin="5" Padding="5" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="#FFEEEEF2">
-				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<Image Height="18" Source="{Binding Path=Tag, RelativeSource={RelativeSource TemplatedParent}}" />
-					<TextBlock Height="18" Text="{TemplateBinding Button.Content}" Margin="10,0,0,0" />
-				</StackPanel>
-			</Button>
-		</ControlTemplate>
 		<ControlTemplate x:Key="IconBtn" TargetType="{x:Type Button}">
-			<Button Background="Transparent" Margin="5" Padding="5" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+			<Button Background="Transparent" Margin="3" Padding="3" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Center">
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<Image Height="18" Source="{Binding Path=Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+					<Image Height="24" Source="{Binding Path=Tag, RelativeSource={RelativeSource TemplatedParent}}" />
 				</StackPanel>
 			</Button>
 		</ControlTemplate>
+		<ContextMenu x:Key="cmdContextMenu">
+			<MenuItem Header="Save Output" Click="OnSave" />
+			<MenuItem Header="Clear Output" Click="OnClear" />
+			<MenuItem Header="Restart CMD.exe" Click="OnRestart" />
+		</ContextMenu>
 	</Window.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -28,12 +23,10 @@
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 		<ToolBarPanel Grid.Row="0" Orientation="Horizontal" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-			<Button Tag="c:\Download\P.ico" Template="{StaticResource ResourceKey=IconBtn}" />
-			<Button Tag="c:\Download\P.ico" Template="{StaticResource ResourceKey=IconBtn}" />
-			<Button Tag="c:\Download\P.ico" Template="{StaticResource ResourceKey=IconBtn}" />
+			<Button Tag="Icons/icon.ico" Template="{StaticResource ResourceKey=IconBtn}" />
 		</ToolBarPanel>
-		<TextBox Grid.Row="1" x:Name="Rst" TextWrapping="Wrap" Padding="10"
-			AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+		<TextBox Grid.Row="1" x:Name="Rst" TextWrapping="Wrap" Padding="10" AcceptsReturn="True"
+			VerticalScrollBarVisibility="Visible" ContextMenu="{StaticResource cmdContextMenu}"
 			FontFamily="Consolas" PreviewKeyDown="OnText"></TextBox>
 	</Grid>
 </Window>

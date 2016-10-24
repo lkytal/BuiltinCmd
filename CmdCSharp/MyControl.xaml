@@ -11,20 +11,18 @@
 		Loaded="OnLoad"
 		Name="MyToolWindow">
 	<UserControl.Resources>
-		<ControlTemplate x:Key="IconBtn" TargetType="{x:Type Button}">
-			<Button Background="Transparent" Margin="5" Padding="5" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<Image Height="18" Width="18" Source="{Binding Path=Tag, RelativeSource={RelativeSource TemplatedParent}}" />
-				</StackPanel>
-			</Button>
-		</ControlTemplate>
+		<ContextMenu x:Key="cmdContextMenu">
+			<MenuItem Header="Save Output" Click="OnSave" />
+			<MenuItem Header="Clear Output" Click="OnClear" />
+			<MenuItem Header="Restart CMD.exe" Click="OnRestart" />
+		</ContextMenu>
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<TextBox Grid.Row="0" x:Name="Rst" TextWrapping="Wrap" Margin="5"
-			AcceptsReturn="True" VerticalScrollBarVisibility="Visible"
+		<TextBox Grid.Row="0" x:Name="Rst" TextWrapping="Wrap" Margin="5" AcceptsReturn="True"
+			VerticalScrollBarVisibility="Visible" ContextMenu="{StaticResource cmdContextMenu}"
 			Background="{DynamicResource VsBrush.ToolWindowBackgroundKey}"
 			Foreground="{DynamicResource VsBrush.WindowText}"
 			FontFamily="Consolas" PreviewKeyDown="OnText">
