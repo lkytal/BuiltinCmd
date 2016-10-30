@@ -169,6 +169,7 @@ namespace Lx.CmdCSharp
 			{
 				FirstRun = false;
 				Rst.BorderThickness = new Thickness(0, 0, 0, 0);
+				Rst.UndoLimit = 100;
 
 				EnvDTE.DTEEvents eventsObj = CmdCSharpPackage.Dte.Events.DTEEvents;
 				eventsObj.OnBeginShutdown += ShutDown;
@@ -316,9 +317,9 @@ namespace Lx.CmdCSharp
 		}
 		private void OnRestart(object sender, EventArgs e)
 		{
-			Proc.Kill();
 			Rst.Text = "";
 			RstLen = 0;
+			Proc.Kill();
 			//Restart();
 		}
 

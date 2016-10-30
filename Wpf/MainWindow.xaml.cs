@@ -294,7 +294,7 @@ namespace Wpf
 			if (saveDlg.ShowDialog() == true)
 			{
 				FileStream saveStream = new FileStream(saveDlg.FileName, FileMode.Create);
-				byte[] data = new UTF8Encoding().GetBytes(this.Rst.Text);
+				byte[] data = new UTF8Encoding().GetBytes(Rst.Text);
 				saveStream.Write(data, 0, data.Length);
 				saveStream.Flush();
 				saveStream.Close();
