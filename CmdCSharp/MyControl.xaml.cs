@@ -96,16 +96,22 @@ namespace Lx.CmdCSharp
 			Init();
 		}
 
+		private void ExtractDir(ref string outputs)
+		{
+			string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
+
+			if (Regex.IsMatch(lastLine, @"^\w:\\\S*>$"))
+			{
+				dir = lastLine.Substring(0, lastLine.Length - 1);
+			}
+		}
+
 		private void AddData(string outputs)
 		{
 			Action act = () =>
 			{
-				string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
-
-				if (Regex.IsMatch(lastLine, @"^\w:\\\S*>$"))
-				{
-					dir = lastLine.Substring(0, lastLine.Length - 1);
-				}
+				ExtractDir(ref outputs);
+				
 
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
@@ -185,6 +191,13 @@ namespace Lx.CmdCSharp
 		private string dir = "";
 		private bool inputed = true;
 
+		private void ResetTabComplete()
+		{
+			tabIndex = 0;
+			tabEnd = Rst.Text.Length;
+			inputed = false;
+		}
+
 		private void OnText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
@@ -227,9 +240,7 @@ namespace Lx.CmdCSharp
 
 				if (inputed)
 				{
-					tabIndex = 0;
-					tabEnd = Rst.Text.Length;
-					inputed = false;
+					ResetTabComplete();					
 				}
 
 				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
@@ -239,10 +250,19 @@ namespace Lx.CmdCSharp
 				{
 					pos = cmd.LastIndexOf(' ');
 				}
+
 				string tabHit = cmd.Substring(pos + 1);
 
 				try
 				{
+					string AdditionalPath = "\\";
+
+					if (tabHit.LastIndexOf('\\') != -1)
+					{
+						AdditionalPath += tabHit.Substring(0, tabHit.LastIndexOf('\\'));
+						tabHit = tabHit.Substring(tabHit.LastIndexOf('\\') + 1);
+					}
+
 					var files = Directory.GetFileSystemEntries(dir, tabHit + "*");
 
 					if (files.Length == 0)
@@ -272,6 +292,8 @@ namespace Lx.CmdCSharp
 			{
 				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
 				RunCmd(cmd);
+
+				ResetTabComplete();
 
 				e.Handled = true;
 			}
@@ -347,6 +369,7 @@ namespace Lx.CmdCSharp
 
 		private void ShutDown()
 		{
+			Proc.EnableRaisingEvents = false;
 			Dispose(true);
 		}
 	}

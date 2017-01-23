@@ -25,10 +25,8 @@ namespace Wpf
 
 			this.Closing += (s, e) =>
 			{
-				CancelToken.Cancel();
-				Proc.Kill();
-				OutputTask.Wait();
-				ErrorTask.Wait();
+				Proc.EnableRaisingEvents = false;
+				Dispose(true);
 			};
 		}
 
@@ -101,16 +99,21 @@ namespace Wpf
 			Init();
 		}
 
+		private void ExtractDir(ref string outputs)
+		{
+			string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
+
+			if (Regex.IsMatch(lastLine, @"^\w:\\\S*>$"))
+			{
+				dir = lastLine.Substring(0, lastLine.Length - 1);
+			}
+		}
+
 		private void AddData(string outputs)
 		{
 			Action act = () =>
 			{
-				string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
-
-				if (Regex.IsMatch(lastLine, @"^\w:\\\S*>$"))
-				{
-					dir = lastLine.Substring(0, lastLine.Length - 1);
-				}
+				ExtractDir(ref outputs);				
 
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
@@ -120,6 +123,7 @@ namespace Wpf
 			this.Dispatcher.BeginInvoke(act);
 		}
 
+		private object Locker = new object();
 		private bool CmdRepl = false;
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
 		{
@@ -167,6 +171,41 @@ namespace Wpf
 		private string dir = "";
 		private bool inputed = true;
 
+		private void ResetTabComplete()
+		{
+			tabIndex = 0;
+			tabEnd = Rst.Text.Length;
+			inputed = false;
+		}
+
+		private void RunCmd(string cmd)
+		{
+			if (cmd == @"cls")
+			{
+				Action act = () =>
+				{
+					Rst.Text = "";
+					RstLen = 0;
+
+					Proc.StandardInput.WriteLine("");
+				};
+
+				this.Dispatcher.BeginInvoke(act);
+			}
+			else
+			{
+				lock (Locker)
+				{
+					RstLen = Rst.Text.Length; //protect input texts
+					CmdRepl = true;
+					Proc.StandardInput.WriteLine(cmd);
+				}
+			}
+
+			CmdList.Add(cmd);
+			CmdPos = CmdList.Count - 1;
+		}
+
 		private void OnText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
@@ -209,9 +248,7 @@ namespace Wpf
 
 				if (inputed)
 				{
-					tabIndex = 0;
-					tabEnd = Rst.Text.Length;
-					inputed = false;
+					ResetTabComplete();					
 				}
 
 				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
@@ -221,11 +258,20 @@ namespace Wpf
 				{
 					pos = cmd.LastIndexOf(' ');
 				}
+
 				string tabHit = cmd.Substring(pos + 1);
 
 				try
 				{
-					var files = Directory.GetFileSystemEntries(dir, tabHit + "*");
+					string AdditionalPath = "\\";
+
+					if (tabHit.LastIndexOf('\\') != -1)
+					{
+						AdditionalPath += tabHit.Substring(0, tabHit.LastIndexOf('\\'));
+						tabHit = tabHit.Substring(tabHit.LastIndexOf('\\') + 1);
+					}
+
+					var files = Directory.GetFileSystemEntries(dir + AdditionalPath, tabHit + "*");
 
 					if (files.Length == 0)
 					{
@@ -254,11 +300,11 @@ namespace Wpf
 			{
 				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
 
-				CmdRepl = true;
-				Proc.StandardInput.WriteLine(cmd);
+				RunCmd(cmd);
+				
 
-				CmdList.Add(cmd);
-				CmdPos = CmdList.Count - 1;
+				ResetTabComplete();
+
 				e.Handled = true;
 			}
 			else
