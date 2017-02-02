@@ -133,6 +133,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api.cs" />
     <Compile Include="MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>
     </Compile>

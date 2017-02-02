@@ -234,6 +234,12 @@ namespace Lx.CmdCSharp
 
 				e.Handled = true;
 			}
+			else if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)) //Keyboard.IsKeyDown(Key.LeftCtrl)
+			{
+				Win32Api.SendCtrlC(Proc);
+
+				e.Handled = true;
+			}
 			else if (e.Key == Key.Tab)
 			{
 				e.Handled = true;
@@ -263,7 +269,7 @@ namespace Lx.CmdCSharp
 						tabHit = tabHit.Substring(tabHit.LastIndexOf('\\') + 1);
 					}
 
-					var files = Directory.GetFileSystemEntries(dir, tabHit + "*");
+					var files = Directory.GetFileSystemEntries(dir + AdditionalPath, tabHit + "*");
 
 					if (files.Length == 0)
 					{
@@ -284,7 +290,7 @@ namespace Lx.CmdCSharp
 				}
 				catch (ArgumentException ex)
 				{
-					Debug.Write(ex);
+					Debug.WriteLine(ex);
 					tabIndex = 0;
 				}
 			}

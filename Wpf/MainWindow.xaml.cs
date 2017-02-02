@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Wpf
 {
@@ -206,6 +208,52 @@ namespace Wpf
 			CmdPos = CmdList.Count - 1;
 		}
 
+		[DllImport("kernel32.dll", SetLastError = true)]
+		static extern bool AttachConsole(uint dwProcessId);
+
+		[DllImport("kernel32.dll", SetLastError = true)]
+		static extern bool SetConsoleCtrlHandler(uint dwProcessId, bool state);
+
+		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+		static extern bool FreeConsole();
+
+		// Enumerated type for the control messages sent to the handler routine
+		enum CtrlTypes : uint
+		{
+			CTRL_C_EVENT = 0,
+			CTRL_BREAK_EVENT,
+			CTRL_CLOSE_EVENT,
+			CTRL_LOGOFF_EVENT = 5,
+			CTRL_SHUTDOWN_EVENT
+		}
+
+		[DllImport("kernel32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool GenerateConsoleCtrlEvent(CtrlTypes dwCtrlEvent, uint dwProcessGroupId);
+
+		public void SendCtrlC(Process proc)
+		{
+			FreeConsole();
+
+			//This does not require the console window to be visible.
+			if (AttachConsole((uint)proc.Id))
+			{
+				//Disable Ctrl-C handling for our program
+				SetConsoleCtrlHandler(0, true);
+				GenerateConsoleCtrlEvent(CtrlTypes.CTRL_C_EVENT, 0);
+
+				// Must wait here. If we don't and re-enable Ctrl-C
+				// handling below too fast, we might terminate ourselves.
+				//proc.WaitForExit(500);
+
+				Thread.Sleep(100);
+
+				//Re-enable Ctrl-C handling or any subsequently started
+				//programs will inherit the disabled state.
+				SetConsoleCtrlHandler(0, false);
+			}
+		}
+
 		private void OnText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
@@ -239,6 +287,12 @@ namespace Wpf
 					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
 					Rst.Select(Rst.Text.Length, 0);
 				}
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)) //Keyboard.IsKeyDown(Key.LeftCtrl)
+			{
+				SendCtrlC(Proc);
 
 				e.Handled = true;
 			}
@@ -316,12 +370,14 @@ namespace Wpf
 		private void OnClear(object sender, EventArgs e)
 		{
 			Rst.Text = "";
+			RstLen = 0;
 			Proc.StandardInput.WriteLine("");
 		}
 		private void OnRestart(object sender, EventArgs e)
 		{
 			Proc.Kill();
 			Rst.Text = "";
+			RstLen = 0;
 			//Restart();
 		}
 
@@ -350,6 +406,8 @@ namespace Wpf
 		private void OnLoad(object sender, EventArgs e)
 		{
 			Init();
+
+			Rst.Focus();
 		}
 	}
 }
