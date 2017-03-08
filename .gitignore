@@ -46,3 +46,5 @@ exe/
 Key.snk
 BackUp/
 Ipch/
+.vs/
+packages/

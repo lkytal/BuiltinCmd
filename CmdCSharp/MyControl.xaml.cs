@@ -111,7 +111,6 @@ namespace Lx.CmdCSharp
 			Action act = () =>
 			{
 				ExtractDir(ref outputs);
-				
 
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
@@ -119,10 +118,10 @@ namespace Lx.CmdCSharp
 				//Rst.ScrollToEnd();
 			};
 
-			this.Dispatcher.BeginInvoke(act);
+			Dispatcher.BeginInvoke(act);
 		}
 
-		private object Locker = new object();
+		private readonly object Locker = new object();
 		private bool CmdRepl = false;
 
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
@@ -184,7 +183,7 @@ namespace Lx.CmdCSharp
 			}
 		}
 
-		private List<string> CmdList = new List<string>();
+		private readonly List<string> CmdList = new List<string>();
 		private int CmdPos = -1;
 		private int tabIndex = 0;
 		private int tabEnd = 0;
@@ -246,7 +245,7 @@ namespace Lx.CmdCSharp
 
 				if (inputed)
 				{
-					ResetTabComplete();					
+					ResetTabComplete();
 				}
 
 				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
@@ -321,7 +320,7 @@ namespace Lx.CmdCSharp
 					Proc.StandardInput.WriteLine("");
 				};
 
-				this.Dispatcher.BeginInvoke(act);
+				Dispatcher.BeginInvoke(act);
 			}
 			else
 			{
