@@ -74,17 +74,20 @@ namespace Lx.CmdCSharp
 
 			Proc = Process.Start(proArgs);
 
-			if (Proc != null)
+			if (Proc == null)
 			{
-				Proc.EnableRaisingEvents = true;
-
-				OutputTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
-				OutputTask.Start();
-				ErrorTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardError, CancelToken));
-				ErrorTask.Start();
-
-				Proc.Exited += (sender, e) => Restart();
+				Rst.Text = "Create cmd process error.";
+				return;
 			}
+
+			Proc.EnableRaisingEvents = true;
+
+			OutputTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
+			OutputTask.Start();
+			ErrorTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardError, CancelToken));
+			ErrorTask.Start();
+
+			Proc.Exited += (sender, e) => Restart();
 		}
 
 		private void Restart()
@@ -124,22 +127,19 @@ namespace Lx.CmdCSharp
 		private readonly object Locker = new object();
 		private bool CmdRepl = false;
 
-		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
+		private void ReadRoutine(StreamReader outputSteam, CancellationTokenSource cancelToken)
 		{
-			char[] data = new char[4096];
+			const int buffLength = 4096;
+
+			char[] data = new char[buffLength];
 
 			while (!cancelToken.Token.IsCancellationRequested)
 			{
 				try
 				{
-					if (output.Peek() == -1)
-					{
-						output.DiscardBufferedData();
-						Thread.Sleep(50);
-						continue;
-					}
+					Thread.Sleep(50);
+					int len = outputSteam.Read(data, 0, buffLength);
 
-					int len = output.Read(data, 0, 4096);
 					StringBuilder str = new StringBuilder();
 					str.Append(data, 0, len);
 
@@ -200,10 +200,6 @@ namespace Lx.CmdCSharp
 		private void OnText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
-			{
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Return && Rst.CaretIndex <= RstLen - 1)
 			{
 				e.Handled = true;
 			}
@@ -295,10 +291,14 @@ namespace Lx.CmdCSharp
 			}
 			else if (e.Key == Key.Return)
 			{
-				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-				RunCmd(cmd);
+				if (Rst.CaretIndex >= RstLen)
+				{
+					string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
 
-				ResetTabComplete();
+					RunCmd(cmd);
+
+					ResetTabComplete();
+				}
 
 				e.Handled = true;
 			}
@@ -334,6 +334,11 @@ namespace Lx.CmdCSharp
 
 			CmdList.Add(cmd);
 			CmdPos = CmdList.Count - 1;
+		}
+
+		private void OnCopy(object sender, RoutedEventArgs e)
+		{
+			Clipboard.SetText(Rst.SelectedText);
 		}
 
 		private void OnClear(object sender, EventArgs e)

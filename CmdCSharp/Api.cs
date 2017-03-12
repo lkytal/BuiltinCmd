@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Reflection;
-using Microsoft.Win32;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Runtime.InteropServices;
 
@@ -11,16 +8,16 @@ namespace Lx.CmdCSharp
 	public static class Win32Api
 	{
 		[DllImport("kernel32.dll", SetLastError = true)]
-		static extern bool AttachConsole(uint dwProcessId);
+		private static extern bool AttachConsole(uint dwProcessId);
 
 		[DllImport("kernel32.dll", SetLastError = true)]
-		static extern bool SetConsoleCtrlHandler(EventHandler handler, bool state);
+		private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool state);
 
 		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-		static extern bool FreeConsole();
+		private static extern bool FreeConsole();
 
 		// Enumerated type for the control messages sent to the handler routine
-		enum CtrlTypes : uint
+		private enum CtrlTypes : uint
 		{
 			CTRL_C_EVENT = 0,
 			CTRL_BREAK_EVENT,

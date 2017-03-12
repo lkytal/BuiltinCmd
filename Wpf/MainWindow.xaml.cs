@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Microsoft.Win32;
-using System.Windows.Input;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Reflection;
-using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using Microsoft.Win32;
 
 namespace Wpf
 {
@@ -25,7 +25,7 @@ namespace Wpf
 
 			Rst.BorderThickness = new Thickness(0, 0, 0, 0);
 
-			this.Closing += (s, e) =>
+			Closing += (s, e) =>
 			{
 				Proc.EnableRaisingEvents = false;
 				Dispose(true);
@@ -37,9 +37,9 @@ namespace Wpf
 			Dispose(false);
 		}
 
-		private bool MDisposed = false;
+		private bool MDisposed;
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "ErrorTask"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "OutputTask")]
+		[SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "ErrorTask"), SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "OutputTask")]
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!MDisposed)
@@ -61,9 +61,9 @@ namespace Wpf
 		}
 
 		private Process Proc;
-		private Task OutputTask = null, ErrorTask = null;
-		private int RstLen = 0;
-		private CancellationTokenSource CancelToken = null;
+		private Task OutputTask, ErrorTask;
+		private int RstLen;
+		private CancellationTokenSource CancelToken;
 
 		private void Init()
 		{
@@ -79,17 +79,17 @@ namespace Wpf
 			};
 
 			Proc = Process.Start(proArgs);
-			if (Proc != null)
-			{
-				Proc.EnableRaisingEvents = true;
 
-				OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
-				OutputTask.Start();
-				ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
-				ErrorTask.Start();
+			if (Proc == null) return;
 
-				Proc.Exited += (sender, e) => Restart();
-			}
+			Proc.EnableRaisingEvents = true;
+
+			OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
+			OutputTask.Start();
+			ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
+			ErrorTask.Start();
+
+			Proc.Exited += (sender, e) => Restart();
 		}
 
 		private void Restart()
@@ -115,34 +115,27 @@ namespace Wpf
 		{
 			Action act = () =>
 			{
-				ExtractDir(ref outputs);				
+				ExtractDir(ref outputs);
 
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
 				Rst.Select(RstLen, 0);
 			};
 
-			this.Dispatcher.BeginInvoke(act);
+			Dispatcher.BeginInvoke(act);
 		}
 
-		private object Locker = new object();
-		private bool CmdRepl = false;
+		private readonly object Locker = new object();
+		private bool CmdRepl;
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
 		{
 			char[] data = new char[4096];
-
-			//TextReader output = TextReader.Synchronized(outputStream);
 
 			while (!cancelToken.Token.IsCancellationRequested)
 			{
 				try
 				{
-					if (output.Peek() == -1)
-					{
-						output.DiscardBufferedData();
-						Thread.Sleep(50);
-						continue;
-					}
+					Thread.Sleep(50);
 
 					int len = output.Read(data, 0, 4096);
 
@@ -166,10 +159,10 @@ namespace Wpf
 			}
 		}
 
-		private List<string> CmdList = new List<string>();
+		private readonly List<string> CmdList = new List<string>();
 		private int CmdPos = -1;
-		private int tabIndex = 0;
-		private int tabEnd = 0;
+		private int tabIndex;
+		private int tabEnd;
 		private string dir = "";
 		private bool inputed = true;
 
@@ -192,7 +185,7 @@ namespace Wpf
 					Proc.StandardInput.WriteLine("");
 				};
 
-				this.Dispatcher.BeginInvoke(act);
+				Dispatcher.BeginInvoke(act);
 			}
 			else
 			{
@@ -260,10 +253,6 @@ namespace Wpf
 			{
 				e.Handled = true;
 			}
-			else if (e.Key == Key.Return && Rst.CaretIndex <= RstLen - 1)
-			{
-				e.Handled = true;
-			}
 			else if (Rst.CaretIndex < RstLen)
 			{
 				Rst.CaretIndex = Rst.Text.Length;
@@ -302,7 +291,7 @@ namespace Wpf
 
 				if (inputed)
 				{
-					ResetTabComplete();					
+					ResetTabComplete();
 				}
 
 				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
@@ -352,12 +341,14 @@ namespace Wpf
 			}
 			else if (e.Key == Key.Return)
 			{
-				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
+				if (Rst.CaretIndex >= RstLen)
+				{
+					string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
 
-				RunCmd(cmd);
-				
+					RunCmd(cmd);
 
-				ResetTabComplete();
+					ResetTabComplete();
+				}
 
 				e.Handled = true;
 			}
@@ -401,6 +392,11 @@ namespace Wpf
 				saveStream.Flush();
 				saveStream.Close();
 			}
+		}
+
+		private void OnCopy(object sender, RoutedEventArgs e)
+		{
+			Clipboard.SetText(Rst.SelectedText);
 		}
 
 		private void OnLoad(object sender, EventArgs e)

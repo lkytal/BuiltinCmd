@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 	<Metadata>
-		<Identity Id="5f1a1460-a418-4fae-9cad-ff1c76b7aed9" Version="1.8.0" Language="en-US" Publisher="Lkytal" />
+		<Identity Id="5f1a1460-a418-4fae-9cad-ff1c76b7aed9" Version="1.9.0" Language="en-US" Publisher="Lkytal" />
 		<DisplayName>BuiltinCmd</DisplayName>
-		<Description xml:space="preserve">Built-in Cmd window for VS2013 and VS2015</Description>
+		<Description xml:space="preserve">Built-in Cmd window for VS2013, VS2015 and VS2017</Description>
 		<Icon>icon.png</Icon>
 		<PreviewImage>screenshot.png</PreviewImage>
 		<Tags>Cmd, Command, Command line, Console</Tags>

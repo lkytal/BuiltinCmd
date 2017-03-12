@@ -84,13 +84,12 @@ namespace Lx.CmdCSharp
 			Dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
 			// Add our command handlers for menu (commands must exist in the .vsct file)
-			OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-			if ( null != mcs )
+			if (GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
 			{
 				// Create the command for the tool window
 				CommandID toolwndCommandID = new CommandID(GuidList.guidCmdCSharpCmdSet, (int)PkgCmdIDList.CmdWnd);
 				MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-				mcs.AddCommand( menuToolWin );
+				mcs.AddCommand(menuToolWin);
 			}
 		}
 		#endregion

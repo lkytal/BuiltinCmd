@@ -16,6 +16,8 @@ preview:
 
 Update log:
 
+* 1.9.0 : Better performance
+* 1.8.0 : Support VS2017
 * 1.7.0 : Autocompletion with tab key
 * 1.6.1 : Fix dispose on shutdown
 * 1.5.1 : Fix for vs2013

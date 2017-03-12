@@ -12,6 +12,7 @@
 			</Button>
 		</ControlTemplate>
 		<ContextMenu x:Key="cmdContextMenu">
+			<MenuItem Header="Copy" Click="OnCopy" />
 			<MenuItem Header="Save Output" Click="OnSave" />
 			<MenuItem Header="Clear Output" Click="OnClear" />
 			<MenuItem Header="Restart CMD.exe" Click="OnRestart" />
