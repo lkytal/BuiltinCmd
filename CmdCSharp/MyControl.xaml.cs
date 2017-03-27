@@ -55,9 +55,10 @@ namespace Lx.CmdCSharp
 		}
 
 		private Process Proc;
-		private System.Threading.Tasks.Task OutputTask = null, ErrorTask = null;
+		private System.Threading.Tasks.Task OutputTask, ErrorTask;
+		private readonly object Locker = new object();
 		private int RstLen = 0;
-		public CancellationTokenSource CancelToken = null;
+		public CancellationTokenSource CancelToken;
 
 		private void Init()
 		{
@@ -124,9 +125,6 @@ namespace Lx.CmdCSharp
 			Dispatcher.BeginInvoke(act);
 		}
 
-		private readonly object Locker = new object();
-		private bool CmdRepl = false;
-
 		private void ReadRoutine(StreamReader outputSteam, CancellationTokenSource cancelToken)
 		{
 			const int buffLength = 4096;
@@ -143,18 +141,7 @@ namespace Lx.CmdCSharp
 					StringBuilder str = new StringBuilder();
 					str.Append(data, 0, len);
 
-					string outputs = str.ToString();
-
-					lock (Locker)
-					{
-						if (CmdRepl)
-						{
-							CmdRepl = false;
-							outputs = outputs.Substring(outputs.IndexOf('\n'));
-						}
-					}
-
-					AddData(outputs);
+					AddData(str.ToString());
 				}
 				catch (IOException)
 				{
@@ -179,7 +166,8 @@ namespace Lx.CmdCSharp
 				EnvDTE.DTEEvents eventsObj = CmdCSharpPackage.Dte.Events.DTEEvents;
 				eventsObj.OnBeginShutdown += ShutDown;
 
-				new System.Threading.Tasks.Task(Init).Start();
+				Init();
+				//new System.Threading.Tasks.Task(Init).Start();
 			}
 		}
 
@@ -188,61 +176,46 @@ namespace Lx.CmdCSharp
 		private int tabIndex = 0;
 		private int tabEnd = 0;
 		private string dir = "";
-		private bool inputed = true;
 
-		private void ResetTabComplete()
+		private void ResetTabComplete(Key key)
 		{
 			tabIndex = 0;
-			tabEnd = Rst.Text.Length;
-			inputed = false;
+
+			switch (key)
+			{
+				case Key.Delete:
+					tabEnd = Rst.Text.Length - 1;
+					break;
+				case Key.Back:
+					tabEnd = Rst.Text.Length - 1;
+					break;
+				default:
+					tabEnd = Rst.Text.Length + 1;
+					break;
+			}
 		}
 
 		private void OnText(object sender, KeyEventArgs e)
 		{
+			if (Rst.CaretIndex < RstLen)
+			{
+				if (e.Key != Key.Left && e.Key != Key.Right)
+				{
+					e.Handled = true;
+				}
+
+				return;
+			}
+
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
 			{
 				e.Handled = true;
+				return;
 			}
-			else if (Rst.CaretIndex < RstLen)
-			{
-				Rst.CaretIndex = Rst.Text.Length; //RstLen;
-			}
-			else if (e.Key == Key.Up)
-			{
-				if (CmdPos >= 0)
-				{
-					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
-					CmdPos -= 1;
-					Rst.Select(Rst.Text.Length, 0);
-				}
 
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Down)
-			{
-				if (CmdPos < CmdList.Count - 2)
-				{
-					CmdPos += 1;
-					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
-					Rst.Select(Rst.Text.Length, 0);
-				}
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)) //Keyboard.IsKeyDown(Key.LeftCtrl)
-			{
-				Win32Api.SendCtrlC(Proc);
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Tab)
+			if (e.Key == Key.Tab)
 			{
 				e.Handled = true;
-
-				if (inputed)
-				{
-					ResetTabComplete();
-				}
 
 				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
 
@@ -288,23 +261,47 @@ namespace Lx.CmdCSharp
 					Debug.WriteLine(ex);
 					tabIndex = 0;
 				}
+
+				return;
 			}
-			else if (e.Key == Key.Return)
+
+			ResetTabComplete(e.Key);
+
+			if (e.Key == Key.Up)
 			{
-				if (Rst.CaretIndex >= RstLen)
+				if (CmdPos >= 0)
 				{
-					string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-
-					RunCmd(cmd);
-
-					ResetTabComplete();
+					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
+					CmdPos -= 1;
+					Rst.Select(Rst.Text.Length, 0);
 				}
 
 				e.Handled = true;
 			}
-			else
+			else if (e.Key == Key.Down)
 			{
-				inputed = true;
+				if (CmdPos < CmdList.Count - 2)
+				{
+					CmdPos += 1;
+					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
+					Rst.Select(Rst.Text.Length, 0);
+				}
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)) //Keyboard.IsKeyDown(Key.LeftCtrl)
+			{
+				Win32Api.SendCtrlC(Proc);
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.Return)
+			{
+				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
+
+				RunCmd(cmd);
+
+				e.Handled = true;
 			}
 		}
 
@@ -326,8 +323,7 @@ namespace Lx.CmdCSharp
 			{
 				lock (Locker)
 				{
-					RstLen = Rst.Text.Length; //protect input texts
-					CmdRepl = true;
+					Rst.Text = Rst.Text.Substring(0, RstLen);
 					Proc.StandardInput.WriteLine(cmd);
 				}
 			}

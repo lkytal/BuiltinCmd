@@ -1,21 +1,22 @@
 # BuiltinCmd
 
-BuildinCmd extension on visual studio gallery
-
-https://visualstudiogallery.msdn.microsoft.com/aa5229b1-8490-47fd-8c1c-1c35e92c61cc
-
 Provide a build-in window to access windows command prompt handily.
 
-Support arrow keys to switch between typed commands and autocompletion with tab key.
+## Highlights
+- Support arrow keys to switch between typed commands
+- Support autocompletion with tab key.
+
+## Preview
+
+![ScreenShot](CmdCSharp/screenshot.png)
 
 Let me know if you have any questions or suggestions.
 
-preview:
+> Install [BuildinCmd](BuildinCmd](https://marketplace.visualstudio.com/items?itemName=lkytal.BuiltinCmd) via VS market
 
-![ScreenShot](https://visualstudiogallery.msdn.microsoft.com/site/view/file/203316/1/Full.png)
+## Update log
 
-Update log:
-
+* 1.9.1 : Fixup tab complete position
 * 1.9.0 : Better performance
 * 1.8.0 : Support VS2017
 * 1.7.0 : Autocompletion with tab key
@@ -25,12 +26,12 @@ Update log:
 * 1.4.0 : Native look as command prompt 
 * 1.3.2 : Fixup scrollToend
 
-My other extentions :
+## My other extentions
 
-StatusInfo
+- ### [SmoothScroll](https://marketplace.visualstudio.com/items?itemName=lkytal.SmoothScroll)
+- ### [StatusInfo](https://marketplace.visualstudio.com/items?itemName=lkytal.StatusInfo)
+- ### [AutoZoom](https://marketplace.visualstudio.com/items?itemName=lkytal.AutoZoom)
+ 
+## Acknowledgment
 
-https://visualstudiogallery.msdn.microsoft.com/cd28d8ed-78eb-45f4-b8c2-a024631d499a
-
-SmoothScroll
-
-https://visualstudiogallery.msdn.microsoft.com/30b1f9a2-845d-48f2-aafc-98ece8817a87
+> <div>Icons made by <a href="http://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>

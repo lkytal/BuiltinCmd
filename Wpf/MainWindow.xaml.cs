@@ -126,7 +126,7 @@ namespace Wpf
 		}
 
 		private readonly object Locker = new object();
-		private bool CmdRepl;
+
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
 		{
 			char[] data = new char[4096];
@@ -144,12 +144,6 @@ namespace Wpf
 
 					string outputs = str.ToString();
 
-					if (CmdRepl)
-					{
-						CmdRepl = false;
-						outputs = outputs.Substring(outputs.IndexOf('\n'));
-					}
-
 					AddData(outputs);
 				}
 				catch (IOException)
@@ -164,13 +158,23 @@ namespace Wpf
 		private int tabIndex;
 		private int tabEnd;
 		private string dir = "";
-		private bool inputed = true;
 
-		private void ResetTabComplete()
+		private void ResetTabComplete(Key key)
 		{
 			tabIndex = 0;
-			tabEnd = Rst.Text.Length;
-			inputed = false;
+
+			switch (key)
+			{
+				case Key.Delete:
+					tabEnd = Rst.Text.Length - 1;
+					break;
+				case Key.Back:
+					tabEnd = Rst.Text.Length - 1;
+					break;
+				default:
+					tabEnd = Rst.Text.Length + 1;
+					break;
+			}
 		}
 
 		private void RunCmd(string cmd)
@@ -191,8 +195,8 @@ namespace Wpf
 			{
 				lock (Locker)
 				{
-					RstLen = Rst.Text.Length; //protect input texts
-					CmdRepl = true;
+					Rst.Text = Rst.Text.Substring(0, RstLen);
+
 					Proc.StandardInput.WriteLine(cmd);
 				}
 			}
@@ -201,98 +205,27 @@ namespace Wpf
 			CmdPos = CmdList.Count - 1;
 		}
 
-		[DllImport("kernel32.dll", SetLastError = true)]
-		static extern bool AttachConsole(uint dwProcessId);
-
-		[DllImport("kernel32.dll", SetLastError = true)]
-		static extern bool SetConsoleCtrlHandler(uint dwProcessId, bool state);
-
-		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-		static extern bool FreeConsole();
-
-		// Enumerated type for the control messages sent to the handler routine
-		enum CtrlTypes : uint
-		{
-			CTRL_C_EVENT = 0,
-			CTRL_BREAK_EVENT,
-			CTRL_CLOSE_EVENT,
-			CTRL_LOGOFF_EVENT = 5,
-			CTRL_SHUTDOWN_EVENT
-		}
-
-		[DllImport("kernel32.dll")]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool GenerateConsoleCtrlEvent(CtrlTypes dwCtrlEvent, uint dwProcessGroupId);
-
-		public void SendCtrlC(Process proc)
-		{
-			FreeConsole();
-
-			//This does not require the console window to be visible.
-			if (AttachConsole((uint)proc.Id))
-			{
-				//Disable Ctrl-C handling for our program
-				SetConsoleCtrlHandler(0, true);
-				GenerateConsoleCtrlEvent(CtrlTypes.CTRL_C_EVENT, 0);
-
-				// Must wait here. If we don't and re-enable Ctrl-C
-				// handling below too fast, we might terminate ourselves.
-				//proc.WaitForExit(500);
-
-				Thread.Sleep(100);
-
-				//Re-enable Ctrl-C handling or any subsequently started
-				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(0, false);
-			}
-		}
-
 		private void OnText(object sender, KeyEventArgs e)
 		{
+			if (Rst.CaretIndex < RstLen)
+			{
+				if (e.Key != Key.Left && e.Key != Key.Right)
+				{
+					e.Handled = true;
+				}
+
+				return;
+			}
+
 			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
 			{
 				e.Handled = true;
+				return;
 			}
-			else if (Rst.CaretIndex < RstLen)
-			{
-				Rst.CaretIndex = Rst.Text.Length;
-			}
-			else if (e.Key == Key.Up)
-			{
-				if (CmdPos >= 0)
-				{
-					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
-					CmdPos -= 1;
-					Rst.Select(Rst.Text.Length, 0);
-				}
 
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Down)
-			{
-				if (CmdPos < CmdList.Count - 2)
-				{
-					CmdPos += 1;
-					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
-					Rst.Select(Rst.Text.Length, 0);
-				}
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)) //Keyboard.IsKeyDown(Key.LeftCtrl)
-			{
-				SendCtrlC(Proc);
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Tab)
+			if (e.Key == Key.Tab)
 			{
 				e.Handled = true;
-
-				if (inputed)
-				{
-					ResetTabComplete();
-				}
 
 				string cmd = Rst.Text.Substring(RstLen, tabEnd - RstLen);
 
@@ -338,23 +271,47 @@ namespace Wpf
 					Debug.WriteLine(ex);
 					tabIndex = 0;
 				}
+
+				return;
 			}
-			else if (e.Key == Key.Return)
+
+			ResetTabComplete(e.Key);
+
+			if (e.Key == Key.Up)
 			{
-				if (Rst.CaretIndex >= RstLen)
+				if (CmdPos >= 0)
 				{
-					string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-
-					RunCmd(cmd);
-
-					ResetTabComplete();
+					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
+					CmdPos -= 1;
+					Rst.Select(Rst.Text.Length, 0);
 				}
 
 				e.Handled = true;
 			}
-			else
+			else if (e.Key == Key.Down)
 			{
-				inputed = true;
+				if (CmdPos < CmdList.Count - 2)
+				{
+					CmdPos += 1;
+					Rst.Text = Rst.Text.Substring(0, RstLen) + CmdList[CmdPos];
+					Rst.Select(Rst.Text.Length, 0);
+				}
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)) //Keyboard.IsKeyDown(Key.LeftCtrl)
+			{
+				SendCtrlC(Proc);
+
+				e.Handled = true;
+			}
+			else if (e.Key == Key.Return)
+			{
+				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
+
+				RunCmd(cmd);
+
+				e.Handled = true;
 			}
 		}
 
@@ -404,6 +361,52 @@ namespace Wpf
 			Init();
 
 			Rst.Focus();
+		}
+
+		[DllImport("kernel32.dll", SetLastError = true)]
+		static extern bool AttachConsole(uint dwProcessId);
+
+		[DllImport("kernel32.dll", SetLastError = true)]
+		static extern bool SetConsoleCtrlHandler(uint dwProcessId, bool state);
+
+		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+		static extern bool FreeConsole();
+
+		// Enumerated type for the control messages sent to the handler routine
+		enum CtrlTypes : uint
+		{
+			CTRL_C_EVENT = 0,
+			CTRL_BREAK_EVENT,
+			CTRL_CLOSE_EVENT,
+			CTRL_LOGOFF_EVENT = 5,
+			CTRL_SHUTDOWN_EVENT
+		}
+
+		[DllImport("kernel32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool GenerateConsoleCtrlEvent(CtrlTypes dwCtrlEvent, uint dwProcessGroupId);
+
+		public void SendCtrlC(Process proc)
+		{
+			FreeConsole();
+
+			//This does not require the console window to be visible.
+			if (AttachConsole((uint)proc.Id))
+			{
+				//Disable Ctrl-C handling for our program
+				SetConsoleCtrlHandler(0, true);
+				GenerateConsoleCtrlEvent(CtrlTypes.CTRL_C_EVENT, 0);
+
+				// Must wait here. If we don't and re-enable Ctrl-C
+				// handling below too fast, we might terminate ourselves.
+				//proc.WaitForExit(500);
+
+				Thread.Sleep(100);
+
+				//Re-enable Ctrl-C handling or any subsequently started
+				//programs will inherit the disabled state.
+				SetConsoleCtrlHandler(0, false);
+			}
 		}
 	}
 }
