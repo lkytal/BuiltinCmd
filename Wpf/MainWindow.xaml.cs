@@ -120,6 +120,9 @@ namespace Wpf
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
 				Rst.Select(RstLen, 0);
+
+				tabIndex = 0;
+				tabEnd = RstLen;
 			};
 
 			Dispatcher.BeginInvoke(act);
@@ -259,7 +262,7 @@ namespace Wpf
 						tabIndex = 0;
 					}
 
-					Rst.Text = Rst.Text.Remove(tabEnd - tabHit.Length);
+					Rst.Text = Rst.Text.Substring(0, tabEnd - tabHit.Length);
 
 					string tabFile = files[tabIndex++];
 					string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);

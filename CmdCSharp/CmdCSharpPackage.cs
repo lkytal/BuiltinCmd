@@ -32,6 +32,9 @@ namespace Lx.CmdCSharp
 	// This attribute registers a tool window exposed by this package.
 	[ProvideToolWindow(typeof(MyToolWindow))]
 	[Guid(GuidList.guidCmdCSharpPkgString)]
+	[ProvideAutoLoad(UIContextGuids80.NoSolution)]
+	[ProvideAutoLoad(UIContextGuids80.SolutionExists)]
+
 	public sealed class CmdCSharpPackage : Package
 	{
 		/// <summary>
@@ -70,8 +73,6 @@ namespace Lx.CmdCSharp
 		// Overridden Package Implementation
 		#region Package Members
 
-		public static EnvDTE.DTE Dte;
-
 		/// <summary>
 		/// Initialization of the package; this method is called right after the package is sited, so this is the place
 		/// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -80,8 +81,6 @@ namespace Lx.CmdCSharp
 		{
 			Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
 			base.Initialize();
-
-			Dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
 			// Add our command handlers for menu (commands must exist in the .vsct file)
 			if (GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs)

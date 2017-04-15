@@ -9,6 +9,12 @@ using System.IO;
 using System.Threading;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using EnvDTE;
+using EnvDTE80;
+using Package = Microsoft.VisualStudio.Shell.Package;
+using Process = System.Diagnostics.Process;
+using Thread = System.Threading.Thread;
 
 namespace Lx.CmdCSharp
 {
@@ -22,7 +28,7 @@ namespace Lx.CmdCSharp
 			InitializeComponent();
 		}
 
-		~ MyControl()
+		~MyControl()
 		{
 			Dispose(false);
 		}
@@ -32,20 +38,22 @@ namespace Lx.CmdCSharp
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "ErrorTask"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "OutputTask")]
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!MDisposed)
+			if (MDisposed)
 			{
-				if (disposing)
-				{
-					CancelToken.Cancel();
-					Proc.Kill();
-					OutputTask.Wait();
-					ErrorTask.Wait();
-					CancelToken.Dispose();
-				}
-				// free native resources
-
-				MDisposed = true;
+				return;
 			}
+
+			if (disposing)
+			{
+				CancelToken.Cancel();
+				Proc.Kill();
+				OutputTask.Wait();
+				ErrorTask.Wait();
+				CancelToken.Dispose();
+			}
+			// free native resources
+
+			MDisposed = true;
 		}
 
 		public void Dispose()
@@ -55,14 +63,21 @@ namespace Lx.CmdCSharp
 		}
 
 		private Process Proc;
-		private System.Threading.Tasks.Task OutputTask, ErrorTask;
+		private Task OutputTask, ErrorTask;
 		private readonly object Locker = new object();
 		private int RstLen = 0;
+		private DTE2 Dte = null;
 		public CancellationTokenSource CancelToken;
 
 		private void Init()
 		{
 			CancelToken = new CancellationTokenSource();
+
+			string path = Dte.Solution.FileName;
+			if (string.IsNullOrEmpty(path))
+			{
+				path = "c:\\";
+			}
 
 			ProcessStartInfo proArgs = new ProcessStartInfo("cmd.exe")
 			{
@@ -70,7 +85,8 @@ namespace Lx.CmdCSharp
 				RedirectStandardOutput = true,
 				RedirectStandardInput = true,
 				RedirectStandardError = true,
-				UseShellExecute = false
+				UseShellExecute = false,
+				WorkingDirectory = Path.GetDirectoryName(path) ?? "c:\\"
 			};
 
 			Proc = Process.Start(proArgs);
@@ -83,9 +99,9 @@ namespace Lx.CmdCSharp
 
 			Proc.EnableRaisingEvents = true;
 
-			OutputTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
+			OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
 			OutputTask.Start();
-			ErrorTask = new System.Threading.Tasks.Task(() => ReadRoutine(Proc.StandardError, CancelToken));
+			ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
 			ErrorTask.Start();
 
 			Proc.Exited += (sender, e) => Restart();
@@ -119,7 +135,9 @@ namespace Lx.CmdCSharp
 				Rst.AppendText(outputs);
 				RstLen = Rst.Text.Length;
 				Rst.Select(RstLen, 0);
-				//Rst.ScrollToEnd();
+
+				tabIndex = 0;
+				tabEnd = RstLen;
 			};
 
 			Dispatcher.BeginInvoke(act);
@@ -155,6 +173,10 @@ namespace Lx.CmdCSharp
 
 		private bool FirstRun = true;
 
+		private Events2 events;
+		private DTEEvents dteEvents;
+		private SolutionEvents solutionEvents;
+
 		private void OnLoad(object sender, EventArgs e)
 		{
 			if (FirstRun)
@@ -162,13 +184,35 @@ namespace Lx.CmdCSharp
 				FirstRun = false;
 				Rst.BorderThickness = new Thickness(0, 0, 0, 0);
 				Rst.UndoLimit = 100;
+				Dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
 
-				EnvDTE.DTEEvents eventsObj = CmdCSharpPackage.Dte.Events.DTEEvents;
-				eventsObj.OnBeginShutdown += ShutDown;
+				if (Dte != null)
+				{
+					events = Dte.Events as Events2;
+					if (events != null)
+					{
+						dteEvents = events.DTEEvents;
+						solutionEvents = events.SolutionEvents;
+						dteEvents.OnBeginShutdown += ShutDown;
+						solutionEvents.Opened += () => SwitchStartupDir("\n====== Detected solution opened ======\n");
+					}
+				}
 
 				Init();
-				//new System.Threading.Tasks.Task(Init).Start();
 			}
+		}
+
+		private void SwitchStartupDir(string msg)
+		{
+			string path = Dte.Solution.FileName;
+			if (string.IsNullOrEmpty(path))
+			{
+				path = "c:\\";
+			}
+			path = Path.GetDirectoryName(path) ?? "c:\\";
+
+			RunCmd("cd /d " + path);
+			AddData(msg);
 		}
 
 		private readonly List<string> CmdList = new List<string>();
@@ -249,7 +293,7 @@ namespace Lx.CmdCSharp
 						tabIndex = 0;
 					}
 
-					Rst.Text = Rst.Text.Remove(tabEnd - tabHit.Length);
+					Rst.Text = Rst.Text.Substring(0, tabEnd - tabHit.Length);
 
 					string tabFile = files[tabIndex++];
 					string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);
@@ -371,6 +415,11 @@ namespace Lx.CmdCSharp
 				saveStream.Flush();
 				saveStream.Close();
 			}
+		}
+
+		private void OnSwitch(object sender, RoutedEventArgs e)
+		{
+			SwitchStartupDir("\n====== Switch to solution dir ======\n");
 		}
 
 		private void ShutDown()
