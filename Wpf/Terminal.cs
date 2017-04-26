@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace Wpf
@@ -12,24 +8,47 @@ namespace Wpf
 	{
 		public readonly TextBox Rst;
 		public int DataLen { get; set; }
+
 		public int Length => Rst.Text.Length;
+
 		public string Text { get => Rst.Text; set => Rst.Text = value; }
 
 		public Terminal(TextBox _textBox)
 		{
-			this.Rst = _textBox;
+			Rst = _textBox;
 		}
 
 		public void AppendText(string text)
 		{
 			Rst.AppendText(text);
-			this.DataLen = Rst.Text.Length;
+			DataLen = Rst.Text.Length;
 			FocusEnd();
 		}
 
 		public void FocusEnd()
 		{
 			Rst.Select(Rst.Text.Length, 0);
+		}
+
+		public void Clear()
+		{
+			Rst.Text = "";
+			DataLen = 0;
+		}
+
+		public void removeInput()
+		{
+			Text = Text.Substring(0, DataLen);
+		}
+
+		public string GetInput()
+		{
+			return Text.Substring(DataLen, Text.Length - DataLen);
+		}
+
+		public string Substring(int start, int length)
+		{
+			return Text.Substring(start, length);
 		}
 	}
 }

@@ -22,7 +22,7 @@ namespace Wpf
 
 		private void OnLoad(object sender, EventArgs e)
 		{
-			controller.cmdReader.Init();
+			controller.Init();
 
 			Rst.Focus();
 
@@ -32,11 +32,16 @@ namespace Wpf
 			};
 		}
 
-		private void OnText(object sender, KeyEventArgs e)
+		private void OnPreviewKeyDown(object sender, KeyEventArgs e)
 		{
 			controller.HandleInput(e);
 		}
-		
+
+		private void OnKeyUp(object sender, KeyEventArgs e)
+		{
+			controller.Inputed(e);
+		}
+
 		private void OnClear(object sender, EventArgs e)
 		{
 			controller.ClearOutput();

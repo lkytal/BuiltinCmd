@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Wpf
@@ -7,70 +6,74 @@ namespace Wpf
 	public class Controller
 	{
 		private readonly MainWindow mainWindow;
-		private readonly object Locker = new object();
-		public readonly HistoryCommand historyCommand;
-		public readonly CmdReader cmdReader;
-		public readonly TabHandler tabHandler;
+		private readonly HistoryCommand historyCommand;
+		private readonly CmdReader cmdReader;
+		private readonly TabHandler tabHandler;
+		public readonly Terminal terminal;
 
-		public int RstLen;
-		public TextBox Rst;
+		public string Input = "";
 
 		public Controller(MainWindow mainWindow)
 		{
+			this.mainWindow = mainWindow;
+
 			historyCommand = new HistoryCommand();
 			cmdReader = new CmdReader(this);
 			tabHandler = new TabHandler(this);
-			
-			this.mainWindow = mainWindow;
-			Rst = mainWindow.Rst;
+			terminal = new Terminal(mainWindow.Rst);
+		}
+
+		public void Init()
+		{
+			cmdReader.Init();
 		}
 
 		public void AddData(string outputs)
 		{
 			tabHandler.ExtractDir(ref outputs);
-			tabHandler.Reset(RstLen);
+			tabHandler.ResetTabComplete();
 
 			Action act = () =>
 			{
-				mainWindow.Rst.AppendText(outputs);
-				RstLen = mainWindow.Rst.Text.Length;
-				mainWindow.Rst.Select(RstLen, 0);
+				terminal.AppendText(outputs);
 			};
 
 			mainWindow.Dispatcher.BeginInvoke(act);
 		}
 
-		private void RunCmd(string cmd)
+		private void RunCmd()
 		{
+			string cmd = terminal.GetInput();
+
 			if (cmd == "cls")
 			{
 				Action act = () =>
 				{
-					mainWindow.Rst.Text = "";
-					RstLen = 0;
-
-					cmdReader.Input("");
+					terminal.Clear();
 				};
 
-				mainWindow.Dispatcher.BeginInvoke(act);
+				mainWindow.Dispatcher.Invoke(act);
+
+				cmdReader.Input("");
 			}
 			else
 			{
-				lock (Locker)
+				Action act = () =>
 				{
-					mainWindow.Rst.Text = mainWindow.Rst.Text.Substring(0, RstLen);
+					terminal.removeInput();
+				};
 
-					cmdReader.Input(cmd);
-				}
+				mainWindow.Dispatcher.Invoke(act); //No async, ensure is done
+
+				cmdReader.Input(cmd);
 			}
 
 			historyCommand.Add(cmd);
 		}
 
-
 		public void HandleInput(KeyEventArgs e)
 		{
-			if (Rst.CaretIndex < RstLen)
+			if (terminal.Rst.CaretIndex < terminal.DataLen)
 			{
 				if (e.Key != Key.Left && e.Key != Key.Right)
 				{
@@ -80,7 +83,7 @@ namespace Wpf
 				return;
 			}
 
-			if (e.Key == Key.Back && Rst.CaretIndex <= RstLen)
+			if (e.Key == Key.Back && terminal.Rst.CaretIndex <= terminal.DataLen)
 			{
 				e.Handled = true;
 				return;
@@ -90,18 +93,18 @@ namespace Wpf
 			{
 				e.Handled = true;
 
-				if (tabHandler.HandleTab()) return;
+				if (tabHandler.HandleTab(Input)) return;
 			}
 
-			tabHandler.ResetTabComplete(e.Key);
+			tabHandler.ResetTabComplete();
 
 			if (e.Key == Key.Up)
 			{
 				string cmd = historyCommand.SelectPreviuos();
 				if (cmd != null)
 				{
-					Rst.Text = Rst.Text.Substring(0, RstLen) + cmd;
-					Rst.Select(Rst.Text.Length, 0);
+					terminal.Text = terminal.Text.Substring(0, terminal.DataLen) + cmd;
+					terminal.Rst.Select(terminal.Text.Length, 0);
 				}
 
 				e.Handled = true;
@@ -112,8 +115,8 @@ namespace Wpf
 
 				if (previousCmd != null)
 				{
-					Rst.Text = Rst.Text.Substring(0, RstLen) + previousCmd;
-					Rst.Select(Rst.Text.Length, 0);
+					terminal.Text = terminal.Text.Substring(0, terminal.DataLen) + previousCmd;
+					terminal.Rst.Select(terminal.Text.Length, 0);
 				}
 
 				e.Handled = true;
@@ -126,9 +129,7 @@ namespace Wpf
 			}
 			else if (e.Key == Key.Return)
 			{
-				string cmd = Rst.Text.Substring(RstLen, Rst.Text.Length - RstLen);
-
-				RunCmd(cmd);
+				RunCmd();
 
 				e.Handled = true;
 			}
@@ -141,16 +142,22 @@ namespace Wpf
 
 		public void ClearOutput()
 		{
-			Rst.Text = "";
-			RstLen = 0;
+			terminal.Clear();
 			cmdReader.Input("");
 		}
 
 		public void RestartProc()
 		{
+			terminal.Clear();
 			cmdReader.Restart();
-			Rst.Text = "";
-			RstLen = 0;
+		}
+
+		public void Inputed(KeyEventArgs ev)
+		{
+			if (ev.Key != Key.Tab)
+			{
+				Input = terminal.GetInput();
+			}
 		}
 	}
 }

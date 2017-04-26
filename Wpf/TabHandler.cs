@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows.Input;
 
 namespace Wpf
 {
@@ -10,41 +9,21 @@ namespace Wpf
 	{
 		private readonly Controller controller;
 		private int tabIndex;
-		private int tabEnd;
 		private string dir = "";
 
 		public TabHandler(Controller _controller)
 		{
-			this.controller = _controller;
+			controller = _controller;
 		}
 
-		public void Reset(int RstLen)
+		public void ResetTabComplete()
 		{
 			tabIndex = 0;
-			tabEnd = RstLen;
 		}
 
-		public void ResetTabComplete(Key key)
+		public bool HandleTab(string Input)
 		{
-			tabIndex = 0;
-
-			switch (key)
-			{
-				case Key.Delete:
-					tabEnd = controller.Rst.Text.Length - 1;
-					break;
-				case Key.Back:
-					tabEnd = controller.Rst.Text.Length - 1;
-					break;
-				default:
-					tabEnd = controller.Rst.Text.Length + 1;
-					break;
-			}
-		}
-
-		public bool HandleTab()
-		{
-			string cmd = controller.Rst.Text.Substring(controller.RstLen, tabEnd - controller.RstLen);
+			string cmd = Input;
 
 			int pos = cmd.LastIndexOf('"');
 			if (pos == -1)
@@ -56,7 +35,7 @@ namespace Wpf
 
 			try
 			{
-				string AdditionalPath = "\\";
+				string AdditionalPath = "";
 
 				if (tabHit.LastIndexOf('\\') != -1)
 				{
@@ -64,7 +43,7 @@ namespace Wpf
 					tabHit = tabHit.Substring(tabHit.LastIndexOf('\\') + 1);
 				}
 
-				var files = Directory.GetFileSystemEntries(dir + AdditionalPath, tabHit + "*");
+				var files = Directory.GetFileSystemEntries(dir + "\\" + AdditionalPath, tabHit + "*");
 
 				if (files.Length == 0)
 				{
@@ -76,12 +55,12 @@ namespace Wpf
 					tabIndex = 0;
 				}
 
-				controller.Rst.Text = controller.Rst.Text.Substring(0, tabEnd - tabHit.Length);
+				controller.terminal.Text = controller.terminal.Substring(0, controller.terminal.DataLen + Input.Length - tabHit.Length);
 
 				string tabFile = files[tabIndex++];
 				string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);
-				controller.Rst.AppendText(tabName);
-				controller.Rst.Select(controller.Rst.Text.Length, 0);
+				controller.terminal.Rst.AppendText(tabName);
+				controller.terminal.FocusEnd();
 			}
 			catch (ArgumentException ex)
 			{

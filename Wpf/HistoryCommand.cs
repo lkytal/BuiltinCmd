@@ -16,7 +16,7 @@ namespace Wpf
 
 		public void Add(string cmd)
 		{
-			if(GetCurrent() != cmd) historyList.Add(cmd);
+			if(GetItem(Size) != cmd) historyList.Add(cmd);
 			Index = historyList.Count;
 		}
 
