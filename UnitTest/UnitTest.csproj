@@ -50,16 +50,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HistoryCmdTest.cs" />
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Wpf\Wpf.csproj">
-      <Project>{41cfb2b7-9487-4d2a-9de8-fde463f06e37}</Project>
-      <Name>Wpf</Name>
+    <ProjectReference Include="..\BuiltinCmd\BuiltinCmd.csproj">
+      <Project>{01a8246a-55c1-4394-8b90-b014c7110382}</Project>
+      <Name>BuiltinCmd</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

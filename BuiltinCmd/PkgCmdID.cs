@@ -2,7 +2,7 @@
 // MUST match PkgCmdID.h
 using System;
 
-namespace Lx.CmdCSharp
+namespace BuiltinCmd
 {
     static class PkgCmdIDList
     {

@@ -3,13 +3,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
-using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 
-namespace Lx.CmdCSharp
+namespace BuiltinCmd
 {
 	/// <summary>
 	/// This is the class that implements the package exposed by this assembly.

@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wpf;
+using CmdHost;
 
 namespace UnitTest
 {
@@ -27,17 +27,13 @@ namespace UnitTest
 		[TestMethod]
 		public void TestUp()
 		{
-			string c3 = h.SelectPreviuos();
-			Assert.AreEqual(c3, "333");
+			Assert.AreEqual(h.SelectPreviuos(), "333");
 
-			string c2 = h.SelectPreviuos();
-			Assert.AreEqual(c2, "222");
+			Assert.AreEqual(h.SelectPreviuos(), "222");
 
-			string c1 = h.SelectPreviuos();
-			Assert.AreEqual(c1, "11");
+			Assert.AreEqual(h.SelectPreviuos(), "11");
 
-			string c0 = h.SelectPreviuos();
-			Assert.AreEqual(c0, null);
+			Assert.AreEqual(h.SelectPreviuos(), "11");
 		}
 
 		[TestMethod]

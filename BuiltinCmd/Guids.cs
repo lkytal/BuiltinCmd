@@ -2,7 +2,7 @@
 // MUST match guids.h
 using System;
 
-namespace Lx.CmdCSharp
+namespace BuiltinCmd
 {
 	internal static class GuidList
 	{

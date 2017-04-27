@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuiltinCmd", "CmdCSharp\BuiltinCmd.csproj", "{01A8246A-55C1-4394-8B90-B014C7110382}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuiltinCmd", "BuiltinCmd\BuiltinCmd.csproj", "{01A8246A-55C1-4394-8B90-B014C7110382}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf", "Wpf\Wpf.csproj", "{41CFB2B7-9487-4D2A-9DE8-FDE463F06E37}"
 EndProject

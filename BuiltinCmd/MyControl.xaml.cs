@@ -10,7 +10,7 @@ using EnvDTE80;
 using Package = Microsoft.VisualStudio.Shell.Package;
 using CmdHost;
 
-namespace Lx.CmdCSharp
+namespace BuiltinCmd
 {
 	/// <summary>
 	/// Interaction logic for MyControl.xaml
