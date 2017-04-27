@@ -37,11 +37,6 @@ namespace Wpf
 			controller.HandleInput(e);
 		}
 
-		private void OnKeyUp(object sender, KeyEventArgs e)
-		{
-			controller.Inputed(e);
-		}
-
 		private void OnClear(object sender, EventArgs e)
 		{
 			controller.ClearOutput();

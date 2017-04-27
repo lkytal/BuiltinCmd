@@ -11,8 +11,6 @@ namespace Wpf
 		private readonly TabHandler tabHandler;
 		private readonly Terminal terminal;
 
-		public string Input = "";
-
 		public Controller(MainWindow mainWindow)
 		{
 			this.mainWindow = mainWindow;
@@ -35,7 +33,7 @@ namespace Wpf
 
 			Action act = () =>
 			{
-				terminal.AppendText(outputs);
+				terminal.AppendOutput(outputs);
 			};
 
 			mainWindow.Dispatcher.BeginInvoke(act);
@@ -43,7 +41,7 @@ namespace Wpf
 
 		private void RunCmd()
 		{
-			string cmd = terminal.GetInput();
+			string cmd = terminal.GetCmd();
 
 			if (cmd == "cls")
 			{
@@ -73,7 +71,7 @@ namespace Wpf
 
 		public void HandleInput(KeyEventArgs e)
 		{
-			if (terminal.Rst.CaretIndex < terminal.DataLen)
+			if (terminal.CaretIndex < terminal.DataLen)
 			{
 				if (e.Key != Key.Left && e.Key != Key.Right)
 				{
@@ -83,7 +81,7 @@ namespace Wpf
 				return;
 			}
 
-			if (e.Key == Key.Back && terminal.Rst.CaretIndex <= terminal.DataLen)
+			if (e.Key == Key.Back && terminal.CaretIndex <= terminal.DataLen)
 			{
 				e.Handled = true;
 				return;
@@ -93,31 +91,24 @@ namespace Wpf
 			{
 				e.Handled = true;
 
-				if (tabHandler.HandleTab(Input)) return;
+				if (tabHandler.HandleTab())
+				{
+					return;
+				}
 			}
 
 			tabHandler.ResetTabComplete();
 
 			if (e.Key == Key.Up)
 			{
-				string cmd = historyCommand.SelectPreviuos();
-				if (cmd != null)
-				{
-					terminal.Text = terminal.Text.Substring(0, terminal.DataLen) + cmd;
-					terminal.Rst.Select(terminal.Text.Length, 0);
-				}
+				terminal.setInput(historyCommand.SelectPreviuos());
 
 				e.Handled = true;
 			}
 			else if (e.Key == Key.Down)
 			{
-				string previousCmd = historyCommand.SelectNext();
 
-				if (previousCmd != null)
-				{
-					terminal.Text = terminal.Text.Substring(0, terminal.DataLen) + previousCmd;
-					terminal.Rst.Select(terminal.Text.Length, 0);
-				}
+				terminal.setInput(historyCommand.SelectNext());
 
 				e.Handled = true;
 			}
@@ -150,14 +141,6 @@ namespace Wpf
 		{
 			terminal.Clear();
 			cmdReader.Restart();
-		}
-
-		public void Inputed(KeyEventArgs ev)
-		{
-			if (ev.Key != Key.Tab)
-			{
-				Input = terminal.GetInput();
-			}
 		}
 	}
 }

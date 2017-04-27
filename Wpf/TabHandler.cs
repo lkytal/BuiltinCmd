@@ -21,17 +21,17 @@ namespace Wpf
 			tabIndex = 0;
 		}
 
-		public bool HandleTab(string Input)
+		public bool HandleTab()
 		{
-			string cmd = Input;
+			string Input = terminal.GetInput();
 
-			int pos = cmd.LastIndexOf('"');
+			int pos = Input.LastIndexOf('"');
 			if (pos == -1)
 			{
-				pos = cmd.LastIndexOf(' ');
+				pos = Input.LastIndexOf(' ');
 			}
 
-			string tabHit = cmd.Substring(pos + 1);
+			string tabHit = Input.Substring(pos + 1);
 
 			try
 			{
@@ -55,12 +55,10 @@ namespace Wpf
 					tabIndex = 0;
 				}
 
-				terminal.Text = terminal.Substring(0, terminal.DataLen + Input.Length - tabHit.Length);
-
 				string tabFile = files[tabIndex++];
 				string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);
-				terminal.Rst.AppendText(tabName);
-				terminal.FocusEnd();
+
+				terminal.setInput(Input.Substring(0, Input.Length - tabHit.Length) + tabName);
 			}
 			catch (ArgumentException ex)
 			{
