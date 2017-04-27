@@ -37,7 +37,7 @@ namespace CmdHost
 
 		public void AddData(string outputs)
 		{
-			tabHandler.ExtractDir(ref outputs);
+			tabHandler.ExtractDir(outputs);
 			tabHandler.ResetTabComplete();
 
 			Action act = () =>
@@ -92,33 +92,15 @@ namespace CmdHost
 
 		public void HandleInput(KeyEventArgs e)
 		{
-			if (terminal.CaretIndex < terminal.DataLen)
+			if (NoEditArea(e))
 			{
-				if (e.Key != Key.Left && e.Key != Key.Right)
-				{
-					e.Handled = true;
-				}
-
 				return;
 			}
 
-			if (e.Key == Key.Back && terminal.CaretIndex <= terminal.DataLen)
+			if (tabHandler.IsTab(e))
 			{
-				e.Handled = true;
 				return;
 			}
-
-			if (e.Key == Key.Tab)
-			{
-				e.Handled = true;
-
-				if (tabHandler.HandleTab())
-				{
-					return;
-				}
-			}
-
-			tabHandler.ResetTabComplete();
 
 			if (e.Key == Key.Up)
 			{
@@ -145,6 +127,27 @@ namespace CmdHost
 
 				e.Handled = true;
 			}
+		}
+
+		private bool NoEditArea(KeyEventArgs e)
+		{
+			if (terminal.CaretIndex < terminal.DataLen)
+			{
+				if (e.Key != Key.Left && e.Key != Key.Right)
+				{
+					e.Handled = true;
+				}
+
+				return true;
+			}
+
+			if (e.Key == Key.Back && terminal.CaretIndex <= terminal.DataLen)
+			{
+				e.Handled = true;
+				return true;
+			}
+
+			return false;
 		}
 
 		public void Close()

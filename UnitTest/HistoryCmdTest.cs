@@ -33,7 +33,7 @@ namespace UnitTest
 
 			Assert.AreEqual(h.SelectPreviuos(), "11");
 
-			Assert.AreEqual(h.SelectPreviuos(), "11");
+			Assert.AreEqual(h.SelectPreviuos(), null);
 		}
 
 		[TestMethod]

@@ -42,7 +42,7 @@ namespace CmdHost
 
 		public void Clear()
 		{
-			Rst.Text = "";
+			Rst.Clear();
 			DataLen = 0;
 		}
 

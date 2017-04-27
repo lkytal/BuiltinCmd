@@ -44,9 +44,10 @@ namespace CmdHost
 			if (Index >= 1)
 			{
 				Index -= 1;
+				return GetCurrent();
 			}
 
-			return GetCurrent();
+			return null;
 		}
 
 		public string SelectNext()
