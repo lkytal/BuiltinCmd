@@ -9,7 +9,7 @@ namespace Wpf
 		private readonly HistoryCommand historyCommand;
 		private readonly CmdReader cmdReader;
 		private readonly TabHandler tabHandler;
-		public readonly Terminal terminal;
+		private readonly Terminal terminal;
 
 		public string Input = "";
 
@@ -19,8 +19,8 @@ namespace Wpf
 
 			historyCommand = new HistoryCommand();
 			cmdReader = new CmdReader(this);
-			tabHandler = new TabHandler(this);
 			terminal = new Terminal(mainWindow.Rst);
+			tabHandler = new TabHandler(terminal);
 		}
 
 		public void Init()

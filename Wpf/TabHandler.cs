@@ -7,13 +7,13 @@ namespace Wpf
 {
 	public class TabHandler
 	{
-		private readonly Controller controller;
+		private readonly Terminal terminal;
 		private int tabIndex;
 		private string dir = "";
 
-		public TabHandler(Controller _controller)
+		public TabHandler(Terminal _terminal)
 		{
-			controller = _controller;
+			terminal = _terminal;
 		}
 
 		public void ResetTabComplete()
@@ -55,12 +55,12 @@ namespace Wpf
 					tabIndex = 0;
 				}
 
-				controller.terminal.Text = controller.terminal.Substring(0, controller.terminal.DataLen + Input.Length - tabHit.Length);
+				terminal.Text = terminal.Substring(0, terminal.DataLen + Input.Length - tabHit.Length);
 
 				string tabFile = files[tabIndex++];
 				string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);
-				controller.terminal.Rst.AppendText(tabName);
-				controller.terminal.FocusEnd();
+				terminal.Rst.AppendText(tabName);
+				terminal.FocusEnd();
 			}
 			catch (ArgumentException ex)
 			{

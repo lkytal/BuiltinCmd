@@ -16,7 +16,11 @@ namespace Wpf
 
 		public void Add(string cmd)
 		{
-			if(GetItem(Size) != cmd) historyList.Add(cmd);
+			if (cmd != null && !cmd.Equals(GetItem(Size - 1)))
+			{
+				historyList.Add(cmd);
+			}
+
 			Index = historyList.Count;
 		}
 
@@ -37,15 +41,12 @@ namespace Wpf
 
 		public string SelectPreviuos()
 		{
-			string cmd = null;
-
 			if (Index >= 1)
 			{
 				Index -= 1;
-				cmd = GetCurrent();
 			}
 
-			return cmd;
+			return GetCurrent();
 		}
 
 		public string SelectNext()
