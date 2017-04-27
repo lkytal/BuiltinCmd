@@ -1,23 +1,32 @@
 using System;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
-namespace Wpf
+namespace CmdHost
 {
+	public interface UI
+	{
+		Dispatcher Dispatcher { get; }
+
+		TextBox GetTextBox();
+	}
+
 	public class Controller
 	{
-		private readonly MainWindow mainWindow;
+		private readonly UI mainWindow;
 		private readonly HistoryCommand historyCommand;
 		private readonly CmdReader cmdReader;
 		private readonly TabHandler tabHandler;
 		private readonly Terminal terminal;
 
-		public Controller(MainWindow mainWindow)
+		public Controller(UI _ui)
 		{
-			this.mainWindow = mainWindow;
+			this.mainWindow = _ui;
 
 			historyCommand = new HistoryCommand();
 			cmdReader = new CmdReader(this);
-			terminal = new Terminal(mainWindow.Rst);
+			terminal = new Terminal(mainWindow.GetTextBox());
 			tabHandler = new TabHandler(terminal);
 		}
 
@@ -37,6 +46,18 @@ namespace Wpf
 			};
 
 			mainWindow.Dispatcher.BeginInvoke(act);
+		}
+
+		public void InvokeCmd(string input, string cmd)
+		{
+			Action act = () =>
+			{
+				terminal.AppendOutput(input);
+			};
+
+			mainWindow.Dispatcher.Invoke(act);
+
+			cmdReader.Input(cmd);
 		}
 
 		private void RunCmd()

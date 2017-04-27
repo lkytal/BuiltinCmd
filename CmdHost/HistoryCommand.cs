@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Wpf
+namespace CmdHost
 {
 	public class HistoryCommand
 	{

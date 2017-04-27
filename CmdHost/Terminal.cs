@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Wpf
+namespace CmdHost
 {
 	public class Terminal
 	{
@@ -13,7 +13,7 @@ namespace Wpf
 		public string Text { get => Rst.Text; set => Rst.Text = value; }
 		public int CaretIndex => Rst.CaretIndex;
 
-		public string Input = "";
+		private string Input = "";
 
 		public Terminal(TextBox _textBox)
 		{

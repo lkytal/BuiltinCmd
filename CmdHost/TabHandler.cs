@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace Wpf
+namespace CmdHost
 {
 	public class TabHandler
 	{

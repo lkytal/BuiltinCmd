@@ -217,6 +217,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <Import Project="..\CmdHost\CmdHost.projitems" Label="Shared" />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>

@@ -2,12 +2,14 @@
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using CmdHost;
 using Microsoft.Win32;
 
 namespace Wpf
 {
-	public partial class MainWindow : Window
+	public partial class MainWindow : Window, UI
 	{
 		private readonly Controller controller;
 
@@ -30,6 +32,11 @@ namespace Wpf
 			{
 				controller.Close();
 			};
+		}
+
+		public TextBox GetTextBox()
+		{
+			return this.Rst;
 		}
 
 		private void OnPreviewKeyDown(object sender, KeyEventArgs e)

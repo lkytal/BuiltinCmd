@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>bacd8abe-d1fe-4af0-a0f3-20b28f014f08</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>CmdHost</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CmdReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controller.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HistoryCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TabHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Terminal.cs" />
+  </ItemGroup>
+</Project>

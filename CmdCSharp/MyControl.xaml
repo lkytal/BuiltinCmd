@@ -27,7 +27,7 @@
 			VerticalScrollBarVisibility="Visible" ContextMenu="{StaticResource cmdContextMenu}"
 			Background="{DynamicResource VsBrush.ToolWindowBackgroundKey}"
 			Foreground="{DynamicResource VsBrush.WindowText}"
-			FontFamily="Consolas" PreviewKeyDown="OnText">
+			FontFamily="Consolas" PreviewKeyDown="OnPreviewKeyDown">
 		</TextBox>
 	</Grid>
 </UserControl>

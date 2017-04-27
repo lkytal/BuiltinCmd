@@ -70,11 +70,6 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
-    <Compile Include="CmdReader.cs" />
-    <Compile Include="Controller.cs" />
-    <Compile Include="HistoryCommand.cs" />
-    <Compile Include="TabHandler.cs" />
-    <Compile Include="Terminal.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -135,6 +130,7 @@
   <ItemGroup>
     <Resource Include="Icons\icon.ico" />
   </ItemGroup>
+  <Import Project="..\CmdHost\CmdHost.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	   Other similar extension points exist, see Microsoft.Common.targets.

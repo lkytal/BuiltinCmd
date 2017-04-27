@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmdCSharp", "CmdCSharp\CmdCSharp.csproj", "{01A8246A-55C1-4394-8B90-B014C7110382}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuiltinCmd", "CmdCSharp\BuiltinCmd.csproj", "{01A8246A-55C1-4394-8B90-B014C7110382}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf", "Wpf\Wpf.csproj", "{41CFB2B7-9487-4D2A-9DE8-FDE463F06E37}"
 EndProject
@@ -11,7 +11,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CmdLine", "CmdLine\CmdLine.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{1034DC21-694C-4D5C-81CF-6F0D3EB2207F}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CmdHost", "CmdHost\CmdHost.shproj", "{BACD8ABE-D1FE-4AF0-A0F3-20B28F014F08}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		CmdHost\CmdHost.projitems*{01a8246a-55c1-4394-8b90-b014c7110382}*SharedItemsImports = 4
+		CmdHost\CmdHost.projitems*{41cfb2b7-9487-4d2a-9de8-fde463f06e37}*SharedItemsImports = 4
+		CmdHost\CmdHost.projitems*{bacd8abe-d1fe-4af0-a0f3-20b28f014f08}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
