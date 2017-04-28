@@ -23,20 +23,7 @@ namespace CmdHost
 			tabIndex = 0;
 		}
 
-		public bool IsTab(KeyEventArgs e)
-		{
-			if (e.Key == Key.Tab)
-			{
-				e.Handled = true;
-				return HandleTab();
-			}
-
-			ResetTabComplete(); //Reset when input
-
-			return false;
-		}
-
-		public bool HandleTab()
+		public void HandleTab()
 		{
 			string Input = terminal.GetInput();
 
@@ -54,8 +41,6 @@ namespace CmdHost
 				Debug.WriteLine(ex);
 				ResetTabComplete();
 			}
-
-			return true;
 		}
 
 		private string GetFile(string AdditionalPath, string tabHit)

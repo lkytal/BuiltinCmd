@@ -46,11 +46,6 @@ namespace CmdHost
 			DataLen = 0;
 		}
 
-		public void removeInput()
-		{
-			Text = Text.Substring(0, DataLen);
-		}
-
 		public string GetCmd()
 		{
 			return Text.Substring(DataLen, Text.Length - DataLen);
@@ -78,6 +73,11 @@ namespace CmdHost
 		public string GetInput()
 		{
 			return Input;
+		}
+
+		public void removeInput()
+		{
+			Text = Text.Substring(0, DataLen);
 		}
 	}
 }

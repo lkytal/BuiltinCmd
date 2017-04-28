@@ -33,7 +33,7 @@ namespace BuiltinCmd
 	[ProvideAutoLoad(UIContextGuids80.NoSolution)]
 	[ProvideAutoLoad(UIContextGuids80.SolutionExists)]
 
-	public sealed class CmdCSharpPackage : Package
+	public sealed class BuiltinCmdPackage : Package
 	{
 		/// <summary>
 		/// Default constructor of the package.
@@ -42,7 +42,7 @@ namespace BuiltinCmd
 		/// not sited yet inside Visual Studio environment. The place to do all the other
 		/// initialization is the Initialize method.
 		/// </summary>
-		public CmdCSharpPackage()
+		public BuiltinCmdPackage()
 		{
 			Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
 		}

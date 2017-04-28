@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CmdReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controller.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HistoryCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NativeMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TabHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Terminal.cs" />
   </ItemGroup>

@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include <windows.h>
+#include <tchar.h>
 #include <iostream>
 
 using namespace std;
@@ -65,6 +66,4 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		WriteFile(hInWrite, command, strlen(command), &rt, NULL);
 	}
-
-	return 0;
 }

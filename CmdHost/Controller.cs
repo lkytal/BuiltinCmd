@@ -40,12 +40,10 @@ namespace CmdHost
 			tabHandler.ExtractDir(outputs);
 			tabHandler.ResetTabComplete();
 
-			Action act = () =>
+			mainWindow.Dispatcher.Invoke(() =>
 			{
 				terminal.AppendOutput(outputs);
-			};
-
-			mainWindow.Dispatcher.BeginInvoke(act);
+			});
 		}
 
 		public void InvokeCmd(string input, string cmd)
@@ -66,23 +64,20 @@ namespace CmdHost
 
 			if (cmd == "cls")
 			{
-				Action act = () =>
+				mainWindow.Dispatcher.Invoke(() =>
 				{
 					terminal.Clear();
-				};
-
-				mainWindow.Dispatcher.Invoke(act);
+				});
 
 				cmdReader.Input("");
 			}
 			else
 			{
-				Action act = () =>
+				//No async, ensure is done
+				mainWindow.Dispatcher.Invoke(() =>
 				{
 					terminal.removeInput();
-				};
-
-				mainWindow.Dispatcher.Invoke(act); //No async, ensure is done
+				});
 
 				cmdReader.Input(cmd);
 			}
@@ -92,41 +87,61 @@ namespace CmdHost
 
 		public void HandleInput(KeyEventArgs e)
 		{
-			if (NoEditArea(e))
-			{
-				return;
-			}
-
-			if (tabHandler.IsTab(e))
-			{
-				return;
-			}
-
-			if (e.Key == Key.Up)
-			{
-				terminal.setInput(historyCommand.SelectPreviuos());
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Down)
-			{
-
-				terminal.setInput(historyCommand.SelectNext());
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control)) //Keyboard.IsKeyDown(Key.LeftCtrl)
+			if (e.Key == Key.C && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control))
 			{
 				cmdReader.SendCtrlC();
-
 				e.Handled = true;
+				return;
 			}
-			else if (e.Key == Key.Return)
+
+			if (NoEditArea(e))
 			{
-				RunCmd();
+				e.Handled = true;
+				return;
+			}
 
+			if (e.Key == Key.Tab)
+			{
+				tabHandler.HandleTab();
+				e.Handled = true;
+				return;
+			}
+			else
+			{
+				tabHandler.ResetTabComplete();
+			}
+
+			if (ControlKeys(e))
+			{
 				e.Handled = true;
 			}
+		}
+
+		private bool ControlKeys(KeyEventArgs e)
+		{
+			switch (e.Key)
+			{
+				case Key.Up:
+					terminal.setInput(historyCommand.SelectPreviuos());
+					break;
+
+				case Key.Down:
+					terminal.setInput(historyCommand.SelectNext());
+					break;
+
+				case Key.Home:
+					terminal.FocusEnd();
+					break;
+
+				case Key.Return:
+					RunCmd();
+					break;
+
+				default:
+					return false;
+			}
+
+			return true;
 		}
 
 		private bool NoEditArea(KeyEventArgs e)
@@ -135,15 +150,12 @@ namespace CmdHost
 			{
 				if (e.Key != Key.Left && e.Key != Key.Right)
 				{
-					e.Handled = true;
+					return true;
 				}
-
-				return true;
 			}
 
 			if (e.Key == Key.Back && terminal.CaretIndex <= terminal.DataLen)
 			{
-				e.Handled = true;
 				return true;
 			}
 
