@@ -29,7 +29,7 @@ namespace BuiltinCmd
 	[ProvideMenuResource("Menus.ctmenu", 1)]
 	// This attribute registers a tool window exposed by this package.
 	[ProvideToolWindow(typeof(MyToolWindow))]
-	[Guid(GuidList.guidCmdCSharpPkgString)]
+	[Guid(GuidList.guidBuiltinCmdPkgString)]
 	[ProvideAutoLoad(UIContextGuids80.NoSolution)]
 	[ProvideAutoLoad(UIContextGuids80.SolutionExists)]
 
@@ -84,7 +84,7 @@ namespace BuiltinCmd
 			if (GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
 			{
 				// Create the command for the tool window
-				CommandID toolwndCommandID = new CommandID(GuidList.guidCmdCSharpCmdSet, (int)PkgCmdIDList.CmdWnd);
+				CommandID toolwndCommandID = new CommandID(GuidList.guidBuiltinCmdCmdSet, (int)PkgCmdIDList.CmdWnd);
 				MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
 				mcs.AddCommand(menuToolWin);
 			}

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CmdHost
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
 	public class CmdReader
 	{
 		private readonly Controller controller;
@@ -19,7 +20,7 @@ namespace CmdHost
 			controller = _controller;
 		}
 
-		public void Init()
+		public void Init(string projectPath = null)
 		{
 			CancelToken = new CancellationTokenSource();
 
@@ -31,6 +32,11 @@ namespace CmdHost
 				RedirectStandardError = true,
 				UseShellExecute = false
 			};
+
+			if (!string.IsNullOrEmpty(projectPath))
+			{
+				proArgs.WorkingDirectory = projectPath;
+			}
 
 			Proc = Process.Start(proArgs);
 
@@ -99,7 +105,7 @@ namespace CmdHost
 
 		public void SendCtrlC()
 		{
-			NativeMethod.SendCtrlC(Proc);
+			NativeMethods.SendCtrlC(Proc);
 		}
 	}
 }

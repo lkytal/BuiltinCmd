@@ -187,7 +187,7 @@
     <None Include="Key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="CmdCSharp.vsct">
+    <VSCTCompile Include="BuiltinCmd.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>

@@ -35,6 +35,11 @@ namespace CmdHost
 			cmdReader.Init();
 		}
 
+		public void Init(string projectPath)
+		{
+			cmdReader.Init(projectPath);
+		}
+
 		public void AddData(string outputs)
 		{
 			tabHandler.ExtractDir(outputs);

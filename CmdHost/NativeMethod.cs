@@ -1,10 +1,11 @@
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace CmdHost
 {
-	public class NativeMethod
+	public class NativeMethods
 	{
 		// ReSharper disable UnusedMember.Local
 		private enum CtrlTypes : uint
@@ -16,11 +17,13 @@ namespace CmdHost
 			CTRL_SHUTDOWN_EVENT
 		}
 
+		private delegate bool ConsoleCtrlDelegate(CtrlTypes CtrlType);
+
 		[DllImport("kernel32.dll", SetLastError = true)]
 		private static extern bool AttachConsole(uint dwProcessId);
 
 		[DllImport("kernel32.dll", SetLastError = true)]
-		private static extern bool SetConsoleCtrlHandler(uint dwProcessId, bool state);
+		private static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate Handler, bool Add);
 
 		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
 		private static extern bool FreeConsole();
@@ -37,7 +40,7 @@ namespace CmdHost
 			if (AttachConsole((uint)proc.Id))
 			{
 				//Disable Ctrl-C handling for our program
-				SetConsoleCtrlHandler(0, true);
+				SetConsoleCtrlHandler(null, true);
 				GenerateConsoleCtrlEvent(CtrlTypes.CTRL_C_EVENT, 0);
 
 				// Must wait here. If we don't and re-enable Ctrl-C
@@ -48,7 +51,7 @@ namespace CmdHost
 
 				//Re-enable Ctrl-C handling or any subsequently started
 				//programs will inherit the disabled state.
-				SetConsoleCtrlHandler(0, false);
+				SetConsoleCtrlHandler(null, false);
 			}
 		}
 	}

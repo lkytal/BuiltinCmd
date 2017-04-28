@@ -57,11 +57,18 @@ namespace BuiltinCmd
 					}
 				}
 
-				controller.Init();
+				controller.Init(GetProjectPath());
 			}
 		}
 
 		private void SwitchStartupDir(string msg)
+		{
+			string path = GetProjectPath();
+
+			controller.InvokeCmd(msg, "cd /d " + path);
+		}
+
+		private string GetProjectPath()
 		{
 			string path = Dte.Solution.FileName;
 			if (string.IsNullOrEmpty(path))
@@ -70,7 +77,7 @@ namespace BuiltinCmd
 			}
 			path = Path.GetDirectoryName(path) ?? "c:\\";
 
-			controller.InvokeCmd(msg, "cd /d " + path);
+			return path;
 		}
 
 		private void OnPreviewKeyDown(object sender, KeyEventArgs e)
