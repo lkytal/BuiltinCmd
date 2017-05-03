@@ -63,7 +63,15 @@ namespace BuiltinCmd
 				throw new NotSupportedException(Resources.CanNotCreateWindow);
 			}
 			IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-			ErrorHandler.ThrowOnFailure(windowFrame.Show());
+
+			if (windowFrame.IsVisible() == VSConstants.S_OK)
+			{
+				ErrorHandler.ThrowOnFailure(windowFrame.Hide());
+			}
+			else
+			{
+				ErrorHandler.ThrowOnFailure(windowFrame.Show());
+			}
 		}
 
 

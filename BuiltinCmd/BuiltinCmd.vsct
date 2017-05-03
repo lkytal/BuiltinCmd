@@ -61,7 +61,7 @@
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="bmpIcon" />
         <Strings>
-          <ButtonText>BuiltinCmd</ButtonText>
+          <ButtonText>Toggle BuiltinCmd</ButtonText>
         </Strings>
       </Button>
 
@@ -82,10 +82,13 @@
   </Commands>
 
 
+  <KeyBindings>
+    <KeyBinding guid="guidBuiltinCmdCmdSet" id="CmdWnd"
+                key1="T" mod1="CONTROL SHIFT" editor="guidVSStd97" />
+  </KeyBindings>
 
-
-
-  <Symbols>
+  
+    <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidBuiltinCmdPkg" value="{5f1a1460-a418-4fae-9cad-ff1c76b7aed9}" />
 
