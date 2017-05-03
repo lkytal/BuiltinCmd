@@ -43,6 +43,7 @@ $tf*/
 Unicode/
 exe/
 *.pdf
+*.vsix
 Key.snk
 BackUp/
 Ipch/

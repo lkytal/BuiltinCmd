@@ -59,9 +59,9 @@
 
       <Button guid="guidBuiltinCmdCmdSet" id="CmdWnd" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="bmpPic2" />
+        <Icon guid="guidImages" id="bmpIcon" />
         <Strings>
-          <ButtonText>Cmd</ButtonText>
+          <ButtonText>BuiltinCmd</ButtonText>
         </Strings>
       </Button>
 
@@ -75,7 +75,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Images.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
+      <Bitmap guid="guidImages" href="Resources\MenuIcon.png" usedList="bmpIcon"/>
 
     </Bitmaps>
 
@@ -99,12 +99,7 @@
 
 
     <GuidSymbol name="guidImages" value="{5af137ea-4ce3-4f0e-86e1-75f7af7925f9}" >
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
+      <IDSymbol name="bmpIcon" value="1" />
     </GuidSymbol>
   </Symbols>
 

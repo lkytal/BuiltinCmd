@@ -8,7 +8,7 @@ Provide a built-in window to access windows command prompt handily.
 
 ## Preview
 
-![ScreenShot](BuiltinCmd/screenshot.png)
+![ScreenShot](BuiltinCmd/Resources/screenshot.png)
 
 Let me know if you have any questions or suggestions.
 

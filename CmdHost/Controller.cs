@@ -22,7 +22,7 @@ namespace CmdHost
 
 		public Controller(UI _ui)
 		{
-			this.mainWindow = _ui;
+			mainWindow = _ui;
 
 			historyCommand = new HistoryCommand();
 			cmdReader = new CmdReader(this);
@@ -53,12 +53,10 @@ namespace CmdHost
 
 		public void InvokeCmd(string input, string cmd)
 		{
-			Action act = () =>
+			mainWindow.Dispatcher.Invoke(() =>
 			{
 				terminal.AppendOutput(input);
-			};
-
-			mainWindow.Dispatcher.Invoke(act);
+			});
 
 			cmdReader.Input(cmd);
 		}
