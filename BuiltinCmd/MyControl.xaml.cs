@@ -30,7 +30,7 @@ namespace BuiltinCmd
 			controller = new Controller(this);
 		}
 
-		private DTE2 Dte = null;
+		private DTE2 Dte;
 		private Events2 events;
 		private DTEEvents dteEvents;
 		private SolutionEvents solutionEvents;

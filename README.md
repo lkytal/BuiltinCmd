@@ -16,6 +16,7 @@ Let me know if you have any questions or suggestions.
 
 ## Update log
 
+* 1.9.4 : Better caret color when using dark theme
 * 1.9.2 : Project dir supported
 * 1.9.1 : Fix up tab complete position
 * 1.9.0 : Better performance

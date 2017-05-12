@@ -3,9 +3,9 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
-		Background="{DynamicResource VsBrush.ToolWindowBackgroundKey}"
-		Foreground="{DynamicResource VsBrush.WindowText}"
+		xmlns:vs="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
+		Background="{DynamicResource {x:Static vs:VsBrushes.ToolWindowBackgroundKey}}"
+		Foreground="{DynamicResource {x:Static vs:VsBrushes.WindowTextKey}}"
 		mc:Ignorable="d"
 		d:DesignHeight="300" d:DesignWidth="700"
 		Loaded="OnLoad"
@@ -14,9 +14,9 @@
 		<ContextMenu x:Key="cmdContextMenu">
 			<MenuItem Header="Copy" Click="OnCopy" />
 			<MenuItem Header="Save Output" Click="OnSave" />
-            <MenuItem Header="Clear Output" Click="OnClear" />
-		    <MenuItem Header="Switch to Project Dir" Click="OnSwitch" />
-            <MenuItem Header="Restart CMD.exe" Click="OnRestart" />
+			<MenuItem Header="Clear Output" Click="OnClear" />
+			<MenuItem Header="Switch to Project Dir" Click="OnSwitch" />
+			<MenuItem Header="Restart CMD.exe" Click="OnRestart" />
 		</ContextMenu>
 	</UserControl.Resources>
 	<Grid>
@@ -25,8 +25,9 @@
 		</Grid.RowDefinitions>
 		<TextBox Grid.Row="0" x:Name="Rst" TextWrapping="Wrap" Margin="5" AcceptsReturn="True"
 			VerticalScrollBarVisibility="Visible" ContextMenu="{StaticResource cmdContextMenu}"
-			Background="{DynamicResource VsBrush.ToolWindowBackgroundKey}"
-			Foreground="{DynamicResource VsBrush.WindowText}"
+			Background="{DynamicResource {x:Static vs:VsBrushes.ToolWindowBackgroundKey}}"
+			Foreground="{DynamicResource {x:Static vs:VsBrushes.WindowTextKey}}"
+			CaretBrush="{DynamicResource {x:Static vs:VsBrushes.WindowTextKey}}"
 			FontFamily="Consolas" PreviewKeyDown="OnPreviewKeyDown">
 		</TextBox>
 	</Grid>
