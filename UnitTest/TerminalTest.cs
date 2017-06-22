@@ -47,7 +47,7 @@ namespace UnitTest
 
 			t.AppendText("extra");
 			string input = "net user";
-			t.setInput(input);
+			t.SetInput(input);
 
 			Assert.AreEqual(msg.Length, t.DataLen);
 			Assert.AreEqual(msg + input, t.Text);

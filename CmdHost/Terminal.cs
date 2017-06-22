@@ -61,7 +61,7 @@ namespace CmdHost
 			Rst.AppendText(text);
 		}
 
-		public void setInput(string input)
+		public void SetInput(string input)
 		{
 			if (input != null)
 			{
@@ -75,7 +75,7 @@ namespace CmdHost
 			return Input;
 		}
 
-		public void removeInput()
+		public void RemoveInput()
 		{
 			Text = Text.Substring(0, DataLen);
 		}

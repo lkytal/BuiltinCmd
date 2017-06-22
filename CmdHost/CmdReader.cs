@@ -6,24 +6,49 @@ using System.Threading.Tasks;
 
 namespace CmdHost
 {
+	public interface CmdReceiver
+	{
+		void AddData(string output);
+	}
+
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
 	public class CmdReader
 	{
-		private readonly Controller controller;
-		private Process Proc;
-		private Task OutputTask;
-		private Task ErrorTask;
+		private readonly CmdReceiver Receiver;
+		private Process CmdProc;
+		private Task OutputTask, ErrorTask;
 		private CancellationTokenSource CancelToken;
 
-		public CmdReader(Controller _controller)
+		public CmdReader(CmdReceiver _receiver)
 		{
-			controller = _controller;
+			Receiver = _receiver;
 		}
 
 		public void Init(string projectPath = null)
 		{
 			CancelToken = new CancellationTokenSource();
 
+			if ((CmdProc = CreateProc(projectPath)) == null) return;
+
+			OutputTask = new Task(() => ReadRoutine(CmdProc.StandardOutput, CancelToken));
+			OutputTask.Start();
+			ErrorTask = new Task(() => ReadRoutine(CmdProc.StandardError, CancelToken));
+			ErrorTask.Start();
+
+			CmdProc.EnableRaisingEvents = true;
+
+			CmdProc.Exited += (sender, e) =>
+			{
+				CancelToken.Cancel();
+				OutputTask.Wait();
+				ErrorTask.Wait();
+				CancelToken.Dispose();
+				Init();
+			};
+		}
+
+		private Process CreateProc(string projectPath)
+		{
 			ProcessStartInfo proArgs = new ProcessStartInfo("cmd.exe")
 			{
 				CreateNoWindow = true,
@@ -38,25 +63,7 @@ namespace CmdHost
 				proArgs.WorkingDirectory = projectPath;
 			}
 
-			Proc = Process.Start(proArgs);
-
-			if (Proc == null) return;
-
-			Proc.EnableRaisingEvents = true;
-
-			OutputTask = new Task(() => ReadRoutine(Proc.StandardOutput, CancelToken));
-			OutputTask.Start();
-			ErrorTask = new Task(() => ReadRoutine(Proc.StandardError, CancelToken));
-			ErrorTask.Start();
-
-			Proc.Exited += (sender, e) =>
-			{
-				CancelToken.Cancel();
-				OutputTask.Wait();
-				ErrorTask.Wait();
-				CancelToken.Dispose();
-				Init();
-			};
+			return Process.Start(proArgs);
 		}
 
 		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
@@ -74,20 +81,20 @@ namespace CmdHost
 					StringBuilder str = new StringBuilder();
 					str.Append(data, 0, len);
 
-					controller.AddData(str.ToString());
+					Receiver.AddData(str.ToString());
 				}
 				catch (IOException)
 				{
-					return; //Proc terminated
+					return; //Process terminated
 				}
 			}
 		}
 
 		public void Close()
 		{
-			Proc.EnableRaisingEvents = false;
+			CmdProc.EnableRaisingEvents = false;
 			CancelToken.Cancel();
-			Proc.Kill();
+			CmdProc.Kill();
 			//OutputTask.Wait();
 			//ErrorTask.Wait();
 			CancelToken.Dispose();
@@ -95,17 +102,17 @@ namespace CmdHost
 
 		public void Input(string text)
 		{
-			Proc.StandardInput.WriteLine(text);
+			CmdProc.StandardInput.WriteLine(text);
 		}
 
 		public void Restart()
 		{
-			Proc.Kill();
+			CmdProc.Kill();
 		}
 
 		public void SendCtrlC()
 		{
-			NativeMethods.SendCtrlC(Proc);
+			NativeMethods.SendCtrlC(CmdProc);
 		}
 	}
 }

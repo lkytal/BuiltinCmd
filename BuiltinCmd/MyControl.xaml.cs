@@ -73,8 +73,9 @@ namespace BuiltinCmd
 			string path = Dte.Solution.FileName;
 			if (string.IsNullOrEmpty(path))
 			{
-				path = "c:\\";
+				return "c:\\";
 			}
+
 			path = Path.GetDirectoryName(path) ?? "c:\\";
 
 			return path;

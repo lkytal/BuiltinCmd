@@ -34,7 +34,7 @@ namespace CmdHost
 			{
 				string tabName = GetFile(AdditionalPath, tabHit);
 
-				terminal.setInput(Input.Substring(0, Input.Length - tabHit.Length) + tabName);
+				terminal.SetInput(Input.Substring(0, Input.Length - tabHit.Length) + tabName);
 			}
 			catch (ArgumentException ex)
 			{

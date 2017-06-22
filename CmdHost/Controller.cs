@@ -12,7 +12,7 @@ namespace CmdHost
 		TextBox GetTextBox();
 	}
 
-	public class Controller
+	public class Controller : CmdReceiver
 	{
 		private readonly UI mainWindow;
 		private readonly HistoryCommand historyCommand;
@@ -79,7 +79,7 @@ namespace CmdHost
 				//No async, ensure is done
 				mainWindow.Dispatcher.Invoke(() =>
 				{
-					terminal.removeInput();
+					terminal.RemoveInput();
 				});
 
 				cmdReader.Input(cmd);
@@ -125,11 +125,11 @@ namespace CmdHost
 			switch (e.Key)
 			{
 				case Key.Up:
-					terminal.setInput(historyCommand.SelectPreviuos());
+					terminal.SetInput(historyCommand.SelectPreviuos());
 					break;
 
 				case Key.Down:
-					terminal.setInput(historyCommand.SelectNext());
+					terminal.SetInput(historyCommand.SelectNext());
 					break;
 
 				case Key.Home:

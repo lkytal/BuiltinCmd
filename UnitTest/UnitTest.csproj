@@ -56,6 +56,7 @@
     <Compile Include="TabHandleTest.cs" />
     <Compile Include="UIMock.cs" />
     <Compile Include="TerminalTest.cs" />
+    <Compile Include="CmdReaderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
