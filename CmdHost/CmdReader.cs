@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -24,11 +25,14 @@ namespace CmdHost
 			Receiver = _receiver;
 		}
 
-		public void Init(string projectPath = null)
+		public bool Init(string projectPath = null)
 		{
 			CancelToken = new CancellationTokenSource();
 
-			if ((CmdProc = CreateProc(projectPath)) == null) return;
+			if ((CmdProc = CreateProc(projectPath)) == null)
+			{
+				return false;
+			}
 
 			OutputTask = new Task(() => ReadRoutine(CmdProc.StandardOutput, CancelToken));
 			OutputTask.Start();
@@ -39,12 +43,11 @@ namespace CmdHost
 
 			CmdProc.Exited += (sender, e) =>
 			{
-				CancelToken.Cancel();
-				OutputTask.Wait();
-				ErrorTask.Wait();
-				CancelToken.Dispose();
+				Close();
 				Init();
 			};
+
+			return true;
 		}
 
 		private Process CreateProc(string projectPath)
@@ -70,12 +73,12 @@ namespace CmdHost
 		{
 			char[] data = new char[4096];
 
-			while (!cancelToken.Token.IsCancellationRequested)
+			while (!cancelToken.IsCancellationRequested)
 			{
+				Thread.Sleep(50);
+
 				try
 				{
-					Thread.Sleep(50);
-
 					int len = output.Read(data, 0, 4096);
 
 					StringBuilder str = new StringBuilder();
@@ -83,7 +86,7 @@ namespace CmdHost
 
 					Receiver.AddData(str.ToString());
 				}
-				catch (IOException)
+				catch (Exception)
 				{
 					return; //Process terminated
 				}
@@ -92,12 +95,20 @@ namespace CmdHost
 
 		public void Close()
 		{
-			CmdProc.EnableRaisingEvents = false;
-			CancelToken.Cancel();
-			CmdProc.Kill();
-			//OutputTask.Wait();
-			//ErrorTask.Wait();
-			CancelToken.Dispose();
+			if (CmdProc != null && !CmdProc.HasExited)
+			{
+				CmdProc.EnableRaisingEvents = false;
+				CmdProc.Kill();
+			}
+
+			if (CancelToken != null && !CancelToken.IsCancellationRequested)
+			{
+				CancelToken.Cancel();
+				OutputTask?.Wait(100);
+				ErrorTask?.Wait(100);
+
+				CancelToken.Dispose();
+			}
 		}
 
 		public void Input(string text)
@@ -113,6 +124,11 @@ namespace CmdHost
 		public void SendCtrlC()
 		{
 			NativeMethods.SendCtrlC(CmdProc);
+		}
+
+		~CmdReader()
+		{
+			Close();
 		}
 	}
 }

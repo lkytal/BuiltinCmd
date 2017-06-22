@@ -16,9 +16,18 @@ namespace UnitTest
 			}
 		}
 
-		[TestMethod]
-		public void TestMethod1()
+		public CmdReader NewReader()
 		{
+			return new CmdReader(new MockReceiver());
+		}
+
+		[TestMethod]
+		public void TestCreate()
+		{
+			CmdReader r = NewReader();
+			Assert.IsNotNull(r);
+
+			Assert.IsTrue(r.Init());
 		}
 	}
 }

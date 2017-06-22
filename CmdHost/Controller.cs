@@ -167,7 +167,7 @@ namespace CmdHost
 
 		public void Close()
 		{
-			cmdReader.Close();
+			//cmdReader.Close(); Needless
 		}
 
 		public void ClearOutput()
