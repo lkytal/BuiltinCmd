@@ -10,12 +10,12 @@ namespace UnitTest
 	public class TabHandleTest
 	{
 		private TabHandler t;
-		private readonly UI ui = new UIMock();
+		private readonly TextBoxSource ui = new TextBoxMock();
 
 		[TestInitialize]
 		public void Init()
 		{
-			t = new TabHandler(new Terminal(ui.GetTextBox()));
+			t = new TabHandler(new Terminal(ui));
 			t.ExtractDir(@"c:\>");
 		}
 
@@ -104,7 +104,6 @@ namespace UnitTest
 		[DataRow(@"dir zero\", 1, @"dir zero\w")]
 		[DataRow(@"dir zero\w", 0, @"dir zero\w")]
 		[DataRow(@"dir zero\w", 1, @"dir zero\wpf.exe")]
-
 		public void TestCompleteInput(string input, int index, string expected)
 		{
 			string path = Directory.GetCurrentDirectory();

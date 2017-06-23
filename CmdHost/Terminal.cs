@@ -4,9 +4,15 @@ using System.Windows.Input;
 
 namespace CmdHost
 {
+	public interface TextBoxSource
+	{
+		TextBox GetTextBox();
+	}
+
 	public class Terminal
 	{
-		private readonly TextBox Rst;
+		private readonly TextBoxSource textControl;
+		private TextBox Rst => textControl.GetTextBox();
 
 		public int DataLen { get; private set; }
 		public int Length => Rst.Text.Length;
@@ -15,9 +21,9 @@ namespace CmdHost
 
 		private string Input = "";
 
-		public Terminal(TextBox _textBox)
+		public Terminal(TextBoxSource _textControl)
 		{
-			Rst = _textBox;
+			textControl = _textControl;
 
 			Rst.KeyUp += (s, e) =>
 			{

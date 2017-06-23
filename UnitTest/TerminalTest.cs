@@ -13,7 +13,7 @@ namespace UnitTest
 		[TestInitialize]
 		public void Init()
 		{
-			t = new Terminal(new TextBox());
+			t = new Terminal(new TextBoxMock());
 		}
 
 		[TestMethod]

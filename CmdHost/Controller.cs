@@ -12,7 +12,7 @@ namespace CmdHost
 		TextBox GetTextBox();
 	}
 
-	public class Controller : CmdReceiver
+	public class Controller : CmdReceiver, TextBoxSource
 	{
 		private readonly UI mainWindow;
 		private readonly HistoryCommand historyCommand;
@@ -26,7 +26,7 @@ namespace CmdHost
 
 			historyCommand = new HistoryCommand();
 			cmdReader = new CmdReader(this);
-			terminal = new Terminal(mainWindow.GetTextBox());
+			terminal = new Terminal(this);
 			tabHandler = new TabHandler(terminal);
 		}
 
@@ -180,6 +180,11 @@ namespace CmdHost
 		{
 			terminal.Clear();
 			cmdReader.Restart();
+		}
+
+		public TextBox GetTextBox()
+		{
+			return mainWindow.GetTextBox();
 		}
 	}
 }

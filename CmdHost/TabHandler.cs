@@ -36,19 +36,19 @@ namespace CmdHost
 			}
 		}
 
-		public string CompleteInput(string Input, int index)
+		public string CompleteInput(string input, int index)
 		{
-			string tabHit = ExtractFileName(Input);
+			string tabHit = ExtractFileName(input);
 			string AdditionalPath = SeperatePath(ref tabHit);
 
 			string tabName = GetFile(AdditionalPath, tabHit, index);
 
-			return Input.Substring(0, Input.Length - tabHit.Length) + tabName;
+			return input.Substring(0, input.Length - tabHit.Length) + tabName;
 		}
 
-		public string GetFile(string AdditionalPath, string tabHit, int index)
+		public string GetFile(string additionalPath, string tabHit, int index)
 		{
-			var files = Directory.GetFileSystemEntries(Dir + "\\" + AdditionalPath, tabHit + "*");
+			var files = Directory.GetFileSystemEntries(Dir + "\\" + additionalPath, tabHit + "*");
 
 			if (files.Length == 0)
 			{
@@ -80,15 +80,15 @@ namespace CmdHost
 			return AdditionalPath;
 		}
 
-		public string ExtractFileName(string Input)
+		public string ExtractFileName(string input)
 		{
-			int pos = Input.LastIndexOf('"');
+			int pos = input.LastIndexOf('"');
 			if (pos == -1)
 			{
-				pos = Input.LastIndexOf(' ');
+				pos = input.LastIndexOf(' ');
 			}
 
-			return Input.Substring(pos + 1);
+			return input.Substring(pos + 1);
 		}
 
 		public void ExtractDir(string outputs)
