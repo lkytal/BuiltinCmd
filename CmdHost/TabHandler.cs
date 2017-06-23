@@ -2,15 +2,14 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows.Input;
 
 namespace CmdHost
 {
 	public class TabHandler
 	{
 		private readonly Terminal terminal;
-		private int tabIndex;
 
+		private int TabIndex { get; set; } = 0;
 		public string Dir { get; private set; } = "";
 
 		public TabHandler(Terminal _terminal)
@@ -20,30 +19,34 @@ namespace CmdHost
 
 		public void ResetTabComplete()
 		{
-			tabIndex = 0;
+			TabIndex = 0;
 		}
 
 		public void HandleTab()
 		{
-			string Input = terminal.GetInput();
-
-			string tabHit = ExtractFileName(Input);
-			string AdditionalPath = SeperatePath(ref tabHit);
-
 			try
 			{
-				string tabName = GetFile(AdditionalPath, tabHit);
-
-				terminal.SetInput(Input.Substring(0, Input.Length - tabHit.Length) + tabName);
+				string completedLine = CompleteInput(terminal.GetInput(), TabIndex);
+				terminal.SetInput(completedLine);
+				TabIndex += 1;
 			}
-			catch (ArgumentException ex)
+			catch (Exception)
 			{
-				Debug.WriteLine(ex);
 				ResetTabComplete();
 			}
 		}
 
-		private string GetFile(string AdditionalPath, string tabHit)
+		public string CompleteInput(string Input, int index)
+		{
+			string tabHit = ExtractFileName(Input);
+			string AdditionalPath = SeperatePath(ref tabHit);
+
+			string tabName = GetFile(AdditionalPath, tabHit, index);
+
+			return Input.Substring(0, Input.Length - tabHit.Length) + tabName;
+		}
+
+		public string GetFile(string AdditionalPath, string tabHit, int index)
 		{
 			var files = Directory.GetFileSystemEntries(Dir + "\\" + AdditionalPath, tabHit + "*");
 
@@ -52,12 +55,13 @@ namespace CmdHost
 				return "";
 			}
 
-			if (tabIndex >= files.Length)
+			if (index >= files.Length)
 			{
 				ResetTabComplete();
+				index = 0;
 			}
 
-			string tabFile = files[tabIndex++];
+			string tabFile = files[index];
 			string tabName = tabFile.Substring(tabFile.LastIndexOf('\\') + 1);
 
 			return tabName;
