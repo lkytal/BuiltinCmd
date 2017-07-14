@@ -18,7 +18,9 @@ namespace UnitTest
 
 		public CmdReader NewReader()
 		{
-			return new CmdReader(new MockReceiver());
+			var reader = new CmdReader();
+			//reader.Register(new MockReceiver());
+			return reader;
 		}
 
 		[TestMethod]

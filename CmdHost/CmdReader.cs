@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -15,14 +16,14 @@ namespace CmdHost
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
 	public class CmdReader
 	{
-		private readonly CmdReceiver Receiver;
+		private readonly List<CmdReceiver> Receivers = new List<CmdReceiver>();
 		private Process CmdProc;
 		private Task OutputTask, ErrorTask;
 		private CancellationTokenSource CancelToken;
 
-		public CmdReader(CmdReceiver _receiver)
+		public void Register(CmdReceiver newReceiver)
 		{
-			Receiver = _receiver;
+			Receivers.Add(newReceiver);
 		}
 
 		public bool Init(string projectPath = null)
@@ -84,12 +85,20 @@ namespace CmdHost
 					StringBuilder str = new StringBuilder();
 					str.Append(data, 0, len);
 
-					Receiver.AddData(str.ToString());
+					Notify(str.ToString());
 				}
 				catch (Exception)
 				{
 					return; //Process terminated
 				}
+			}
+		}
+
+		public void Notify(string data)
+		{
+			foreach (var receiver in Receivers)
+			{
+				receiver.AddData(data);
 			}
 		}
 

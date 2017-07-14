@@ -25,7 +25,9 @@ namespace CmdHost
 			mainWindow = _ui;
 
 			historyCommand = new HistoryCommand();
-			cmdReader = new CmdReader(this);
+			cmdReader = new CmdReader();
+			cmdReader.Register(this);
+
 			terminal = new Terminal(this);
 			tabHandler = new TabHandler(terminal);
 		}
