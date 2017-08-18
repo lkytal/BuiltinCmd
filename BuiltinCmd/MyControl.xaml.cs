@@ -81,11 +81,6 @@ namespace BuiltinCmd
 			return path;
 		}
 
-		private void OnPreviewKeyDown(object sender, KeyEventArgs e)
-		{
-			controller.HandleInput(e);
-		}
-
 		private void OnClear(object sender, EventArgs e)
 		{
 			controller.ClearOutput();

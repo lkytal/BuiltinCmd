@@ -24,6 +24,11 @@ namespace CmdHost
 		{
 			mainWindow = _ui;
 
+			mainWindow.GetTextBox().PreviewKeyDown += (sender, e) =>
+			{
+				HandleInput(e);
+			};
+
 			historyCommand = new HistoryCommand();
 			cmdReader = new CmdReader();
 			cmdReader.Register(this);
@@ -53,11 +58,11 @@ namespace CmdHost
 			});
 		}
 
-		public void InvokeCmd(string input, string cmd)
+		public void InvokeCmd(string msg, string cmd)
 		{
 			mainWindow.Dispatcher.Invoke(() =>
 			{
-				terminal.AppendOutput(input);
+				terminal.AppendOutput(msg);
 			});
 
 			cmdReader.Input(cmd);
@@ -101,8 +106,19 @@ namespace CmdHost
 
 			if (NoEditArea(e))
 			{
-				e.Handled = true;
-				return;
+				if (IsCharactor(e.Key))
+				{
+					terminal.FocusEnd();
+				}
+				else if (e.Key >= Key.Left && e.Key <= Key.Down)
+				{
+					return;
+				}
+				else
+				{
+					e.Handled = true;
+					return;
+				}
 			}
 
 			if (e.Key == Key.Tab)
@@ -116,13 +132,23 @@ namespace CmdHost
 				tabHandler.ResetTabComplete();
 			}
 
-			if (ControlKeys(e))
+			if (IsntControlKeys(e))
 			{
 				e.Handled = true;
 			}
 		}
 
-		private bool ControlKeys(KeyEventArgs e)
+		private bool IsCharactor(Key key)
+		{
+			if (key < Key.Z && key > Key.D0)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool IsntControlKeys(KeyEventArgs e)
 		{
 			switch (e.Key)
 			{
@@ -153,10 +179,7 @@ namespace CmdHost
 		{
 			if (terminal.CaretIndex < terminal.DataLen)
 			{
-				if (e.Key != Key.Left && e.Key != Key.Right)
-				{
-					return true;
-				}
+				return true;
 			}
 
 			if (e.Key == Key.Back && terminal.CaretIndex <= terminal.DataLen)

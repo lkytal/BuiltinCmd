@@ -55,7 +55,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	DWORD rt;
 
-	HANDLE h = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Read, 0, 0, &rt);
+	HANDLE h = CreateThread(0, 0, static_cast<LPTHREAD_START_ROUTINE>(Read), 0, 0, &rt);
 	CloseHandle(h);
 
 	while (true)

@@ -28,7 +28,7 @@
 			Background="{DynamicResource {x:Static vs:VsBrushes.ToolWindowBackgroundKey}}"
 			Foreground="{DynamicResource {x:Static vs:VsBrushes.WindowTextKey}}"
 			CaretBrush="{DynamicResource {x:Static vs:VsBrushes.WindowTextKey}}"
-			FontFamily="Consolas" PreviewKeyDown="OnPreviewKeyDown">
+			FontFamily="Consolas">
 		</TextBox>
 	</Grid>
 </UserControl>

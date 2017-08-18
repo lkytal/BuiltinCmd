@@ -1,6 +1,6 @@
 # BuiltinCmd
 
-Provide a built-in window to access windows command prompt handily.
+Provide a built-in terminal to access windows command prompt handily.
 
 ## Highlights
 - Support arrow keys to switch between typed commands

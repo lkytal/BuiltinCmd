@@ -28,6 +28,6 @@
 		</ToolBarPanel>
 		<TextBox Grid.Row="1" x:Name="Rst" TextWrapping="Wrap" Padding="10" AcceptsReturn="True"
 			VerticalScrollBarVisibility="Visible" ContextMenu="{StaticResource cmdContextMenu}"
-			FontFamily="Consolas" PreviewKeyDown="OnPreviewKeyDown"></TextBox>
+			FontFamily="Consolas"></TextBox>
 	</Grid>
 </Window>

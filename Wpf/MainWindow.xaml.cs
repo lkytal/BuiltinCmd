@@ -39,11 +39,6 @@ namespace Wpf
 			return this.Rst;
 		}
 
-		private void OnPreviewKeyDown(object sender, KeyEventArgs e)
-		{
-			controller.HandleInput(e);
-		}
-
 		private void OnClear(object sender, EventArgs e)
 		{
 			controller.ClearOutput();
