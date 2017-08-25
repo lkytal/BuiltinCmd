@@ -106,7 +106,7 @@ namespace CmdHost
 
 			if (NoEditArea(e))
 			{
-				if (IsCharactor(e.Key))
+				if (IsCharactorOrEnter(e.Key))
 				{
 					terminal.FocusEnd();
 				}
@@ -132,15 +132,19 @@ namespace CmdHost
 				tabHandler.ResetTabComplete();
 			}
 
-			if (IsntControlKeys(e))
+			if (IsControlKeys(e))
 			{
 				e.Handled = true;
 			}
 		}
 
-		private bool IsCharactor(Key key)
+		private bool IsCharactorOrEnter(Key key)
 		{
 			if (key < Key.Z && key > Key.D0)
+			{
+				return true;
+			}
+			else if (key == Key.Enter)
 			{
 				return true;
 			}
@@ -148,7 +152,7 @@ namespace CmdHost
 			return false;
 		}
 
-		private bool IsntControlKeys(KeyEventArgs e)
+		private bool IsControlKeys(KeyEventArgs e)
 		{
 			switch (e.Key)
 			{

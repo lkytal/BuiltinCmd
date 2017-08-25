@@ -132,5 +132,10 @@ namespace BuiltinCmd
 		{
 			return this.Rst;
 		}
+
+		private void OnPaste(object sender, RoutedEventArgs e)
+		{
+			Rst.Paste();
+		}
 	}
 }

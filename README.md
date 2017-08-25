@@ -1,10 +1,11 @@
 # BuiltinCmd
 
-Provide a built-in terminal to access windows command prompt handily.
+Integrate CMD terminal into access windows command prompt handily.
 
 ## Highlights
 - Support arrow keys to switch between typed commands
 - Support auto completion with tab key.
+- Support ctrl + c to terminal.
 
 ## Preview
 
@@ -36,4 +37,4 @@ Let me know if you have any questions or suggestions.
 
 ## Acknowledgment
 
-> <div>Icons made by <a href="http://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+> <div>Icons made by <a href="https://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> from <a href="https://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="https://creativecommons.org/licenses/by/4.0/" title="Creative Commons BY 4.0" target="_blank">CC 4.0 BY</a></div>

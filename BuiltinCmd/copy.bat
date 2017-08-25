@@ -1,0 +1,1 @@
+copy bin\Release\BuiltinCmd.vsix BuiltinCmd.vsix /y

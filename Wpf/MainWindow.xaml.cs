@@ -74,5 +74,12 @@ namespace Wpf
 		{
 			Clipboard.SetText(Rst.SelectedText);
 		}
+
+		private void OnPaste(object sender, RoutedEventArgs e)
+		{
+			//var text = Clipboard.GetText();
+
+			Rst.Paste();
+		}
 	}
 }

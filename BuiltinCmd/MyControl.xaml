@@ -13,6 +13,7 @@
 	<UserControl.Resources>
 		<ContextMenu x:Key="cmdContextMenu">
 			<MenuItem Header="Copy" Click="OnCopy" />
+			<MenuItem Header="Paste" Click="OnPaste" />
 			<MenuItem Header="Save Output" Click="OnSave" />
 			<MenuItem Header="Clear Output" Click="OnClear" />
 			<MenuItem Header="Switch to Project Dir" Click="OnSwitch" />
