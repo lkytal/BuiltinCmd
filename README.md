@@ -5,6 +5,8 @@
 
 Integrate windows _cmd_ terminal into Visual Studio.
 
+*You can open it via "view -> other window -> Toggle BuiltinCmd" or just press `Ctrl + Shift + T` to show it.*
+
 Support from VS2013 to VS2017.
 
 ## Highlights
