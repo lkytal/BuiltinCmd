@@ -95,7 +95,7 @@ namespace CmdHost
 		{
 			string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
 
-			if (Regex.IsMatch(lastLine, @"^\w:\\\S*>$"))
+			if (Regex.IsMatch(lastLine, @"^\w:\\[^\x00-\x1F]*>$"))
 			{
 				Dir = lastLine.Substring(0, lastLine.Length - 1);
 			}

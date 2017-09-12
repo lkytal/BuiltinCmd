@@ -3,10 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CmdHost;
+using Microsoft.VisualStudio.TestTools.UnitTesting.STAExtensions;
 
 namespace UnitTest
 {
-	[TestClass]
+	[STATestClass]
 	public class TabHandleTest
 	{
 		private TabHandler t;
@@ -25,6 +26,7 @@ namespace UnitTest
 		[DataRow(@"dir net\local", @"net\local")]
 		[DataRow(@"dir net\local\test", @"net\local\test")]
 		[DataRow(@"dir /L net\local", @"net\local")]
+		[DataRow("dir /L \"net user\\local", @"net user\local")]
 		public void TestExtractFileName(string input, string expected)
 		{
 			Assert.AreEqual(expected, t.ExtractFileName(input));
@@ -46,6 +48,7 @@ namespace UnitTest
 		[DataRow("Microsoft Windows [version 10.0.15063]\n(c) 2017 Microsoft Corporation\nD:\\Code\\C#\\BuiltinCmd>")]
 		[DataRow("Microsoft Windows [version 10.0.15063]\nD:\\Code\\C#\\>")]
 		[DataRow("Microsoft Windows [version 10.0.15063]\nc:\\>")]
+		[DataRow(@"D:\0\Deploy_lky 2017-09-11 21_02_05\Out\TestDir>")]
 		public void TestExtractDir(string value)
 		{
 			string dir = value.Substring(value.LastIndexOf('\n') + 1);
@@ -56,6 +59,7 @@ namespace UnitTest
 		}
 
 		[TestMethod]
+		[DeploymentItem(@"TestDir", "TestDir")]
 		[DataRow("", "", 0, "file.txt")]
 		[DataRow("", "", 1, "w")]
 		[DataRow("", "", 2, "wpf.exe")]
@@ -72,16 +76,17 @@ namespace UnitTest
 		[DataRow("zero", "w", 2, "wpf.exe.json")]
 		public void TestGetFile(string addtionalPath, string tabHit, int index, string expectFile)
 		{
-			string path = Directory.GetCurrentDirectory();
-			path = Directory.GetParent(Directory.GetParent(path).ToString()) + @"\TestDir";
-			t.ExtractDir(path + @"\>");
-			//t.ResetTabComplete();
+			string path = Directory.GetCurrentDirectory() + @"\TestDir";
 			Debug.WriteLine(path);
+
+			t.ExtractDir(path + @"\>");
+			t.ResetTabComplete();
 
 			Assert.AreEqual(expectFile, t.GetFile(addtionalPath, tabHit, index));
 		}
 
 		[TestMethod]
+		[DeploymentItem(@"TestDir", "TestDir")]
 		[DataRow("", 0, "file.txt")]
 		[DataRow("", 1, "w")]
 		[DataRow("", 100, "file.txt")] //over index
@@ -106,11 +111,11 @@ namespace UnitTest
 		[DataRow(@"dir zero\w", 1, @"dir zero\wpf.exe")]
 		public void TestCompleteInput(string input, int index, string expected)
 		{
-			string path = Directory.GetCurrentDirectory();
-			path = Directory.GetParent(Directory.GetParent(path).ToString()) + @"\TestDir";
+			string path = Directory.GetCurrentDirectory() + @"\TestDir";
+			Debug.WriteLine(path);
+
 			t.ExtractDir(path + @"\>");
 			t.ResetTabComplete();
-			Debug.WriteLine(path);
 
 			Assert.AreEqual(expected, t.CompleteInput(input, index));
 		}

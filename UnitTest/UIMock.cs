@@ -25,7 +25,12 @@ namespace UnitTest
 
 	internal class TextBoxMock : TextBoxSource
 	{
-		private readonly TextBox text = new TextBox();
+		private readonly TextBox text;
+
+		public TextBoxMock()
+		{
+			text = new TextBox();
+		}
 
 		public TextBox GetTextBox()
 		{

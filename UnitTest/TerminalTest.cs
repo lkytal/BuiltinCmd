@@ -2,10 +2,12 @@
 using System.Windows.Controls;
 using CmdHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.STAExtensions;
 
 namespace UnitTest
 {
-	[TestClass]
+	//[TestClass]
+	[STATestClass]
 	public class TerminalTest
 	{
 		private Terminal t;

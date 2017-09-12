@@ -87,7 +87,7 @@
                 key1="T" mod1="CONTROL SHIFT" editor="guidVSStd97" />
   </KeyBindings>
 
-  
+
     <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidBuiltinCmdPkg" value="{5f1a1460-a418-4fae-9cad-ff1c76b7aed9}" />

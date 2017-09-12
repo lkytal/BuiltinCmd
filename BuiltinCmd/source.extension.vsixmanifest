@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 	<Metadata>
-		<Identity Id="5f1a1460-a418-4fae-9cad-ff1c76b7aed9" Version="1.9.5" Language="en-US" Publisher="Lkytal" />
+		<Identity Id="5f1a1460-a418-4fae-9cad-ff1c76b7aed9" Version="1.9.6" Language="en-US" Publisher="Lkytal" />
 		<DisplayName>BuiltinCmd</DisplayName>
 		<Description xml:space="preserve">Integrate CMD Terminal into VS2013, VS2015 or VS2017</Description>
 		<License>LICENSE.txt</License>
 		<Icon>Resources/icon.png</Icon>
 		<PreviewImage>Resources/screenshot.png</PreviewImage>
-		<Tags>Terminal, CMD, Command, Command line, Console</Tags>
+		<Tags>Terminal, CMD, console, shell, PowerShell, command, command prompt, bash</Tags>
 	</Metadata>
 	<Installation InstalledByMsi="false">
 		<InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0, 16.0)" />
