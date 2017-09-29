@@ -32,6 +32,7 @@ namespace BuiltinCmd
 	[Guid(GuidList.guidBuiltinCmdPkgString)]
 	[ProvideAutoLoad(UIContextGuids80.NoSolution)]
 	[ProvideAutoLoad(UIContextGuids80.SolutionExists)]
+	[ProvideOptionPage(typeof(OptionsPage), "BuiltinCmd", "General", 0, 0, true)]
 
 	public sealed class BuiltinCmdPackage : Package
 	{
@@ -62,6 +63,7 @@ namespace BuiltinCmd
 			{
 				throw new NotSupportedException(Resources.CanNotCreateWindow);
 			}
+
 			IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
 
 			if (windowFrame.IsVisible() == VSConstants.S_OK)
@@ -74,11 +76,8 @@ namespace BuiltinCmd
 			}
 		}
 
-
-		/////////////////////////////////////////////////////////////////////////////
-		// Overridden Package Implementation
-		#region Package Members
-
+		public static OptionsPage OptionsPage;
+		
 		/// <summary>
 		/// Initialization of the package; this method is called right after the package is sited, so this is the place
 		/// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -87,6 +86,8 @@ namespace BuiltinCmd
 		{
 			Debug.WriteLine ($"Entering Initialize() of: {this}");
 			base.Initialize();
+
+			OptionsPage = base.GetDialogPage(typeof(OptionsPage)) as OptionsPage;
 
 			// Add our command handlers for menu (commands must exist in the .vsct file)
 			if (GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
@@ -97,7 +98,5 @@ namespace BuiltinCmd
 				mcs.AddCommand(menuToolWin);
 			}
 		}
-		#endregion
-
 	}
 }

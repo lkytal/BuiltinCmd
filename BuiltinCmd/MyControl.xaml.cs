@@ -39,26 +39,31 @@ namespace BuiltinCmd
 
 		private void OnLoad(object sender, EventArgs e)
 		{
-			if (FirstRun)
+			if (!FirstRun)
 			{
-				FirstRun = false;
-
-				Dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
-
-				if (Dte != null)
-				{
-					events = Dte.Events as Events2;
-					if (events != null)
-					{
-						dteEvents = events.DTEEvents;
-						solutionEvents = events.SolutionEvents;
-						dteEvents.OnBeginShutdown += ShutDown;
-						solutionEvents.Opened += () => SwitchStartupDir("\n====== Detected solution opened ======\n");
-					}
-				}
-
-				controller.Init(GetProjectPath());
+				return;
 			}
+
+			FirstRun = false;
+
+			Dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
+
+			if (Dte != null)
+			{
+				events = Dte.Events as Events2;
+				if (events != null)
+				{
+					dteEvents = events.DTEEvents;
+					solutionEvents = events.SolutionEvents;
+					dteEvents.OnBeginShutdown += ShutDown;
+					solutionEvents.Opened += () => SwitchStartupDir("\n====== Solution opening Detected ======\n");
+				}
+			}
+
+			controller.Init(GetProjectPath());
+
+			string initScript = BuiltinCmdPackage.OptionsPage?.initScript ?? "";
+			controller.InvokeCmd("Global Init Script ...", initScript);
 		}
 
 		private void SwitchStartupDir(string msg)
@@ -66,6 +71,11 @@ namespace BuiltinCmd
 			string path = GetProjectPath();
 
 			controller.InvokeCmd(msg, "cd /d " + path);
+
+			System.Threading.Thread.Sleep(200); //Wait dir changed
+
+			string initScript = BuiltinCmdPackage.OptionsPage?.projectInitScript ?? "";
+			controller.InvokeCmd("Project Init Script ...", initScript);
 		}
 
 		private string GetProjectPath()

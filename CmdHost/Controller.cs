@@ -58,8 +58,13 @@ namespace CmdHost
 			});
 		}
 
-		public void InvokeCmd(string msg, string cmd)
+		public void InvokeCmd(string msg, string cmd = "")
 		{
+			if (String.IsNullOrEmpty(cmd))
+			{
+				return;
+			}
+
 			mainWindow.Dispatcher.Invoke(() =>
 			{
 				terminal.AppendOutput(msg);

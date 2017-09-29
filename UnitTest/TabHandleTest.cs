@@ -59,6 +59,19 @@ namespace UnitTest
 		}
 
 		[TestMethod]
+		[DataRow("Microsoft Windows [version 10.0.15063]\nPS D:\\Code\\C#\\>")]
+		[DataRow("Microsoft Windows [version 10.0.15063]\nPS c:\\>")]
+		[DataRow(@"PS D:\0\Deploy_lky 2017-09-11 21_02_05\Out\TestDir>")]
+		public void TestExtractPsDir(string value)
+		{
+			string dir = value.Substring(value.LastIndexOf("PS ") + 3);
+			dir = dir.Remove(dir.Length - 1);
+
+			t.ExtractDir(value);
+			Assert.AreEqual(dir, t.Dir);
+		}
+
+		[TestMethod]
 		[DeploymentItem(@"TestDir", "TestDir")]
 		[DataRow("", "", 0, "file.txt")]
 		[DataRow("", "", 1, "w")]
