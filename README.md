@@ -3,16 +3,18 @@
 [![AppVeyor](https://img.shields.io/appveyor/ci/lkytal/builtincmd.svg?style=flat-square)](https://ci.appveyor.com/project/lkytal/builtincmd)
 <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noreferrer noopener"><img src="https://img.shields.io/badge/License-CC_BY--SA_4.0-5E81AC.png?style=flat-square"></a>
 
-Integrate windows _cmd_ terminal into Visual Studio.
+Integrate windows _cmd_ terminal or powershell into Visual Studio.
 
 *You can open it via "view -> other window -> Toggle BuiltinCmd" or just press `Ctrl + Shift + T` to show it.*
 
 Support from VS2013 to VS2017.
 
 ## Highlights
-- Support command history by switching with arrow keys.
+- Support switching within command histories by arrow keys.
 - Support auto completion with _Tab_ key.
 - Support _Ctrl + C_ to terminal.
+- Support Powershell.
+- Support startup commands.
 
 ## Overview
 
@@ -24,6 +26,7 @@ Let me know if you have any questions or suggestions.
 
 ## Update log
 
+- 2.0.0: Support powershell; support startup commands.
 - 1.9.6: Detect white space correctly.
 - 1.9.5: Refine key handling.
 - 1.9.4: Better caret color when using dark theme.

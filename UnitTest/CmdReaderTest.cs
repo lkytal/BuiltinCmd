@@ -8,7 +8,7 @@ namespace UnitTest
 	[TestClass]
 	public class CmdReaderTest
 	{
-		public class MockReceiver : CmdReceiver
+		public class MockReceiver : ICmdReceiver
 		{
 			public void AddData(string output)
 			{

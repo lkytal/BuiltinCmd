@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CmdHost
 {
-	public interface CmdReceiver
+	public interface ICmdReceiver
 	{
 		void AddData(string output);
 	}
@@ -16,23 +16,24 @@ namespace CmdHost
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
 	public class CmdReader
 	{
-		private readonly List<CmdReceiver> Receivers = new List<CmdReceiver>();
+		private readonly List<ICmdReceiver> Receivers = new List<ICmdReceiver>();
 		private Process CmdProc;
 		private Task OutputTask, ErrorTask;
 		private CancellationTokenSource CancelToken;
 
+		public string InitDir { get; set; }
 		public string Shell { get; set; } = "Cmd.exe";
 
-		public void Register(CmdReceiver newReceiver)
+		public void Register(ICmdReceiver newReceiver)
 		{
 			Receivers.Add(newReceiver);
 		}
 
-		public bool Init(string projectPath = null)
+		public bool Init()
 		{
 			CancelToken = new CancellationTokenSource();
 
-			if ((CmdProc = CreateProc(projectPath)) == null)
+			if ((CmdProc = CreateProc()) == null)
 			{
 				return false;
 			}
@@ -53,7 +54,7 @@ namespace CmdHost
 			return true;
 		}
 
-		private Process CreateProc(string projectPath)
+		private Process CreateProc()
 		{
 			ProcessStartInfo proArgs = new ProcessStartInfo(Shell)
 			{
@@ -64,9 +65,9 @@ namespace CmdHost
 				UseShellExecute = false
 			};
 
-			if (!string.IsNullOrEmpty(projectPath))
+			if (!string.IsNullOrEmpty(InitDir))
 			{
-				proArgs.WorkingDirectory = projectPath;
+				proArgs.WorkingDirectory = InitDir;
 			}
 
 			return Process.Start(proArgs);

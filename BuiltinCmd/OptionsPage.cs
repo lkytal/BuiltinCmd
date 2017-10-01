@@ -9,18 +9,18 @@ namespace BuiltinCmd
 	public class OptionsPage : DialogPage
 	{
 		[Category("General")]
-		[Description("Use PowerShell instead of CMD.")]
-		[DisplayName("Use PowerShell")]
+		[Description("Use PowerShell instead of CMD, restart shell to take effect.")]
+		[DisplayName("Use PowerShell instead of CMD")]
 		public bool usePS { get; set; } = false;
 
 		[Category("Parameter")]
-		[Description("Global Startup Command, execute when VS started.")]
-		[DisplayName("Global Startup Command")]
+		[Description("Global Startup Commands, execute when VS started.")]
+		[DisplayName("Global Startup Commands")]
 		public string initScript { get; set; } = "";
 
 		[Category("Parameter")]
-		[Description("Project Startup Command, execute when project opened.")]
-		[DisplayName("Project Startup Command")]
+		[Description("Project-wide Startup Commands, execute when project opened.")]
+		[DisplayName("Project Startup Commands")]
 		public string projectInitScript { get; set; } = "";
 	}
 }

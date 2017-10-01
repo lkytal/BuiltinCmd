@@ -46,6 +46,11 @@ namespace BuiltinCmd
 
 			FirstRun = false;
 
+			Init();
+		}
+
+		private void Init()
+		{
 			Dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
 
 			if (Dte != null)
@@ -60,27 +65,22 @@ namespace BuiltinCmd
 				}
 			}
 
-			if (BuiltinCmdPackage.OptionsPage?.usePS ?? false)
-			{
-				controller.setShell("powershell.exe");
-			}
+			controller.setShell(optionMgr.Shell);
 
 			controller.Init(GetProjectPath());
 
-			string initScript = BuiltinCmdPackage.OptionsPage?.initScript ?? "";
-			controller.InvokeCmd("\n[Global Init Script ...]\n", initScript);
+			controller.InvokeCmd("\n[Global Init Script ...]\n", optionMgr.getGlobalScript());
 		}
 
 		private void SwitchStartupDir(string msg)
 		{
-			string path = GetProjectPath();
-
-			controller.InvokeCmd(msg, "cd /d " + path);
+			var dir = GetProjectPath();
+			controller.setPath(dir);
+			controller.InvokeCmd(msg, optionMgr.cdPrefix() + dir);
 
 			System.Threading.Thread.Sleep(200); //Wait dir changed
-
-			string initScript = BuiltinCmdPackage.OptionsPage?.projectInitScript ?? "";
-			controller.InvokeCmd("\n[Project Init Script ...]\n", initScript);
+			
+			controller.InvokeCmd("\n[Project Init Script ...]\n", optionMgr.getProjectScript());
 		}
 
 		private string GetProjectPath()
@@ -103,6 +103,7 @@ namespace BuiltinCmd
 
 		private void OnRestart(object sender, EventArgs e)
 		{
+			controller.setShell(optionMgr.Shell);
 			controller.RestartProc();
 		}
 

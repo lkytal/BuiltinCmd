@@ -12,7 +12,7 @@ namespace CmdHost
 		TextBox GetTextBox();
 	}
 
-	public class Controller : CmdReceiver, TextBoxSource
+	public class Controller : ICmdReceiver, TextBoxSource
 	{
 		private readonly UI mainWindow;
 		private readonly HistoryCommand historyCommand;
@@ -37,14 +37,15 @@ namespace CmdHost
 			tabHandler = new TabHandler(terminal);
 		}
 
-		public void Init()
+		public void Init(string projectPath = null)
 		{
+			cmdReader.InitDir = projectPath;
 			cmdReader.Init();
 		}
 
-		public void Init(string projectPath)
+		public void setPath(string projectPath)
 		{
-			cmdReader.Init(projectPath);
+			cmdReader.InitDir = projectPath;
 		}
 
 		public void setShell(string shell)
