@@ -11,7 +11,7 @@ namespace BuiltinCmd
 		[Category("General")]
 		[Description("Use PowerShell instead of CMD.")]
 		[DisplayName("Use PowerShell")]
-		public bool usePS { get; set; } = true;
+		public bool usePS { get; set; } = false;
 
 		[Category("Parameter")]
 		[Description("Global Startup Command, execute when VS started.")]

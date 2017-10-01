@@ -60,10 +60,15 @@ namespace BuiltinCmd
 				}
 			}
 
+			if (BuiltinCmdPackage.OptionsPage?.usePS ?? false)
+			{
+				controller.setShell("powershell.exe");
+			}
+
 			controller.Init(GetProjectPath());
 
 			string initScript = BuiltinCmdPackage.OptionsPage?.initScript ?? "";
-			controller.InvokeCmd("Global Init Script ...", initScript);
+			controller.InvokeCmd("\n[Global Init Script ...]\n", initScript);
 		}
 
 		private void SwitchStartupDir(string msg)
@@ -75,7 +80,7 @@ namespace BuiltinCmd
 			System.Threading.Thread.Sleep(200); //Wait dir changed
 
 			string initScript = BuiltinCmdPackage.OptionsPage?.projectInitScript ?? "";
-			controller.InvokeCmd("Project Init Script ...", initScript);
+			controller.InvokeCmd("\n[Project Init Script ...]\n", initScript);
 		}
 
 		private string GetProjectPath()

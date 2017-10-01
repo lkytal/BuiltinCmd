@@ -21,6 +21,8 @@ namespace CmdHost
 		private Task OutputTask, ErrorTask;
 		private CancellationTokenSource CancelToken;
 
+		public string Shell { get; set; } = "Cmd.exe";
+
 		public void Register(CmdReceiver newReceiver)
 		{
 			Receivers.Add(newReceiver);
@@ -53,7 +55,7 @@ namespace CmdHost
 
 		private Process CreateProc(string projectPath)
 		{
-			ProcessStartInfo proArgs = new ProcessStartInfo("cmd.exe")
+			ProcessStartInfo proArgs = new ProcessStartInfo(Shell)
 			{
 				CreateNoWindow = true,
 				RedirectStandardOutput = true,

@@ -93,9 +93,10 @@ namespace CmdHost
 
 		public void ExtractDir(string outputs)
 		{
+			const string regex = @"(?<=^PS )?\w:\\[^\x00-\x1F]*(?=>\s*$)";
+
 			string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
-			string dir = Regex.Match(lastLine, @"(?<=^PS )?\w:\\[^\x00-\x1F]*(?=>$)",
-				RegexOptions.Compiled | RegexOptions.Multiline).Value;
+			string dir = Regex.Match(lastLine, regex, RegexOptions.Compiled).Value;
 
 			if (!String.IsNullOrEmpty(dir))
 			{

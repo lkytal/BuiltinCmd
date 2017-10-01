@@ -47,6 +47,11 @@ namespace CmdHost
 			cmdReader.Init(projectPath);
 		}
 
+		public void setShell(string shell)
+		{
+			cmdReader.Shell = shell;
+		}
+
 		public void AddData(string outputs)
 		{
 			tabHandler.ExtractDir(outputs);
