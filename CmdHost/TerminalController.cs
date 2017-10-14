@@ -5,24 +5,24 @@ using System.Windows.Threading;
 
 namespace CmdHost
 {
-	public interface UI
+	public interface ITerminalBoxProvider
 	{
 		Dispatcher Dispatcher { get; }
 
 		TextBox GetTextBox();
 	}
 
-	public class Controller : ICmdReceiver, TextBoxSource
+	public class TerminalController : ICmdReceiver, ITextBoxSource
 	{
-		private readonly UI mainWindow;
+		private readonly ITerminalBoxProvider mainWindow;
 		private readonly HistoryCommand historyCommand;
 		private readonly CmdReader cmdReader;
 		private readonly TabHandler tabHandler;
-		private readonly Terminal terminal;
+		private readonly TerminalContentMgr terminalContentMgr;
 
-		public Controller(UI _ui)
+		public TerminalController(ITerminalBoxProvider terminalBoxProvider)
 		{
-			mainWindow = _ui;
+			mainWindow = terminalBoxProvider;
 
 			mainWindow.GetTextBox().PreviewKeyDown += (sender, e) =>
 			{
@@ -33,8 +33,8 @@ namespace CmdHost
 			cmdReader = new CmdReader();
 			cmdReader.Register(this);
 
-			terminal = new Terminal(this);
-			tabHandler = new TabHandler(terminal);
+			terminalContentMgr = new TerminalContentMgr(this);
+			tabHandler = new TabHandler(terminalContentMgr);
 		}
 
 		public void Init(string projectPath = null)
@@ -43,12 +43,12 @@ namespace CmdHost
 			cmdReader.Init();
 		}
 
-		public void setPath(string projectPath)
+		public void SetPath(string projectPath)
 		{
 			cmdReader.InitDir = projectPath;
 		}
 
-		public void setShell(string shell)
+		public void SetShell(string shell)
 		{
 			cmdReader.Shell = shell;
 		}
@@ -60,7 +60,7 @@ namespace CmdHost
 
 			mainWindow.Dispatcher.Invoke(() =>
 			{
-				terminal.AppendOutput(outputs);
+				terminalContentMgr.AppendOutput(outputs);
 			});
 		}
 
@@ -73,7 +73,7 @@ namespace CmdHost
 
 			mainWindow.Dispatcher.Invoke(() =>
 			{
-				terminal.AppendOutput(msg);
+				terminalContentMgr.AppendOutput(msg);
 			});
 
 			cmdReader.Input(cmd);
@@ -81,13 +81,13 @@ namespace CmdHost
 
 		private void RunCmd()
 		{
-			string cmd = terminal.GetCmd();
+			string cmd = terminalContentMgr.GetCmd();
 
 			if (cmd == "cls")
 			{
 				mainWindow.Dispatcher.Invoke(() =>
 				{
-					terminal.Clear();
+					terminalContentMgr.Clear();
 				});
 
 				cmdReader.Input("");
@@ -97,7 +97,7 @@ namespace CmdHost
 				//No async, ensure is done
 				mainWindow.Dispatcher.Invoke(() =>
 				{
-					terminal.RemoveInput();
+					terminalContentMgr.RemoveInput();
 				});
 
 				cmdReader.Input(cmd);
@@ -119,7 +119,7 @@ namespace CmdHost
 			{
 				if (IsCharactorOrEnter(e.Key))
 				{
-					terminal.FocusEnd();
+					terminalContentMgr.FocusEnd();
 				}
 				else if (e.Key >= Key.Left && e.Key <= Key.Down)
 				{
@@ -168,15 +168,15 @@ namespace CmdHost
 			switch (e.Key)
 			{
 				case Key.Up:
-					terminal.SetInput(historyCommand.SelectPreviuos());
+					terminalContentMgr.SetInput(historyCommand.SelectPreviuos());
 					break;
 
 				case Key.Down:
-					terminal.SetInput(historyCommand.SelectNext());
+					terminalContentMgr.SetInput(historyCommand.SelectNext());
 					break;
 
 				case Key.Home:
-					terminal.FocusEnd();
+					terminalContentMgr.FocusEnd();
 					break;
 
 				case Key.Return:
@@ -192,12 +192,12 @@ namespace CmdHost
 
 		private bool NoEditArea(KeyEventArgs e)
 		{
-			if (terminal.CaretIndex < terminal.DataLen)
+			if (terminalContentMgr.CaretIndex < terminalContentMgr.DataLen)
 			{
 				return true;
 			}
 
-			if (e.Key == Key.Back && terminal.CaretIndex <= terminal.DataLen)
+			if (e.Key == Key.Back && terminalContentMgr.CaretIndex <= terminalContentMgr.DataLen)
 			{
 				return true;
 			}
@@ -212,13 +212,13 @@ namespace CmdHost
 
 		public void ClearOutput()
 		{
-			terminal.Clear();
+			terminalContentMgr.Clear();
 			cmdReader.Input("");
 		}
 
 		public void RestartProc()
 		{
-			terminal.Clear();
+			terminalContentMgr.Clear();
 			cmdReader.Restart();
 		}
 

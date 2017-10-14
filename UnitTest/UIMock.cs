@@ -7,7 +7,7 @@ using CmdHost;
 
 namespace UnitTest
 {
-	internal class UIMock: UI
+	internal class UIMock: ITerminalBoxProvider
 	{
 		public Dispatcher Dispatcher => Dispatcher.CurrentDispatcher;
 		private readonly TextBox text;
@@ -23,7 +23,7 @@ namespace UnitTest
 		}
 	}
 
-	internal class TextBoxMock : TextBoxSource
+	internal class TextBoxMock : ITextBoxSource
 	{
 		private readonly TextBox text;
 

@@ -11,12 +11,12 @@ namespace UnitTest
 	public class TabHandleTest
 	{
 		private TabHandler t;
-		private readonly TextBoxSource ui = new TextBoxMock();
+		private readonly ITextBoxSource textBoxSrc = new TextBoxMock();
 
 		[TestInitialize]
 		public void Init()
 		{
-			t = new TabHandler(new Terminal(ui));
+			t = new TabHandler(new TerminalContentMgr(textBoxSrc));
 			t.ExtractDir(@"c:\>");
 		}
 

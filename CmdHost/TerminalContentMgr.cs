@@ -4,14 +4,14 @@ using System.Windows.Input;
 
 namespace CmdHost
 {
-	public interface TextBoxSource
+	public interface ITextBoxSource
 	{
 		TextBox GetTextBox();
 	}
 
-	public class Terminal
+	public class TerminalContentMgr
 	{
-		private readonly TextBoxSource textControl;
+		private readonly ITextBoxSource textControl;
 		private TextBox Rst => textControl.GetTextBox();
 
 		public int DataLen { get; private set; }
@@ -19,17 +19,17 @@ namespace CmdHost
 		public string Text { get => Rst.Text; set => Rst.Text = value; }
 		public int CaretIndex => Rst.CaretIndex;
 
-		private string Input = "";
+		private string currentInput = "";
 
-		public Terminal(TextBoxSource _textControl)
+		public TerminalContentMgr(ITextBoxSource textControl)
 		{
-			textControl = _textControl;
+			this.textControl = textControl;
 
 			Rst.KeyUp += (s, e) =>
 			{
 				if (e.Key != Key.Tab)
 				{
-					Input = Text.Substring(DataLen, Text.Length - DataLen);
+					currentInput = Text.Substring(DataLen, Text.Length - DataLen);
 				}
 			};
 		}
@@ -78,7 +78,7 @@ namespace CmdHost
 
 		public string GetInput()
 		{
-			return Input;
+			return currentInput;
 		}
 
 		public void RemoveInput()

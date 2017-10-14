@@ -16,36 +16,36 @@ namespace CmdHost
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
 	public class CmdReader
 	{
-		private readonly List<ICmdReceiver> Receivers = new List<ICmdReceiver>();
-		private Process CmdProc;
-		private Task OutputTask, ErrorTask;
-		private CancellationTokenSource CancelToken;
+		private readonly List<ICmdReceiver> receivers = new List<ICmdReceiver>();
+		private Process cmdProc;
+		private Task outputTask, errorTask;
+		private CancellationTokenSource cancelToken;
 
 		public string InitDir { get; set; }
 		public string Shell { get; set; } = "Cmd.exe";
 
 		public void Register(ICmdReceiver newReceiver)
 		{
-			Receivers.Add(newReceiver);
+			receivers.Add(newReceiver);
 		}
 
 		public bool Init()
 		{
-			CancelToken = new CancellationTokenSource();
+			cancelToken = new CancellationTokenSource();
 
-			if ((CmdProc = CreateProc()) == null)
+			if ((cmdProc = CreateProc()) == null)
 			{
 				return false;
 			}
 
-			OutputTask = new Task(() => ReadRoutine(CmdProc.StandardOutput, CancelToken));
-			OutputTask.Start();
-			ErrorTask = new Task(() => ReadRoutine(CmdProc.StandardError, CancelToken));
-			ErrorTask.Start();
+			outputTask = new Task(() => ReadRoutine(cmdProc.StandardOutput, cancelToken));
+			outputTask.Start();
+			errorTask = new Task(() => ReadRoutine(cmdProc.StandardError, cancelToken));
+			errorTask.Start();
 
-			CmdProc.EnableRaisingEvents = true;
+			cmdProc.EnableRaisingEvents = true;
 
-			CmdProc.Exited += (sender, e) =>
+			cmdProc.Exited += (sender, e) =>
 			{
 				Close();
 				Init();
@@ -99,7 +99,7 @@ namespace CmdHost
 
 		public void Notify(string data)
 		{
-			foreach (var receiver in Receivers)
+			foreach (var receiver in receivers)
 			{
 				receiver.AddData(data);
 			}
@@ -107,35 +107,35 @@ namespace CmdHost
 
 		public void Close()
 		{
-			if (CmdProc != null && !CmdProc.HasExited)
+			if (cmdProc != null && !cmdProc.HasExited)
 			{
-				CmdProc.EnableRaisingEvents = false;
-				CmdProc.Kill();
+				cmdProc.EnableRaisingEvents = false;
+				cmdProc.Kill();
 			}
 
-			if (CancelToken != null && !CancelToken.IsCancellationRequested)
+			if (cancelToken != null && !cancelToken.IsCancellationRequested)
 			{
-				CancelToken.Cancel();
-				OutputTask?.Wait(100);
-				ErrorTask?.Wait(100);
+				cancelToken.Cancel();
+				outputTask?.Wait(100);
+				errorTask?.Wait(100);
 
-				CancelToken.Dispose();
+				cancelToken.Dispose();
 			}
 		}
 
 		public void Input(string text)
 		{
-			CmdProc.StandardInput.WriteLine(text);
+			cmdProc.StandardInput.WriteLine(text);
 		}
 
 		public void Restart()
 		{
-			CmdProc.Kill();
+			cmdProc.Kill();
 		}
 
 		public void SendCtrlC()
 		{
-			NativeMethods.SendCtrlC(CmdProc);
+			NativeMethods.SendCtrlC(cmdProc);
 		}
 
 		~CmdReader()

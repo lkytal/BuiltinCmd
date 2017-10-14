@@ -7,14 +7,14 @@ namespace CmdHost
 {
 	public class TabHandler
 	{
-		private readonly Terminal terminal;
+		private readonly TerminalContentMgr terminal;
 
 		private int TabIndex { get; set; } = 0;
 		public string Dir { get; private set; } = "";
 
-		public TabHandler(Terminal _terminal)
+		public TabHandler(TerminalContentMgr terminal)
 		{
-			terminal = _terminal;
+			this.terminal = terminal;
 		}
 
 		public void ResetTabComplete()
@@ -39,9 +39,9 @@ namespace CmdHost
 		public string CompleteInput(string input, int index)
 		{
 			string tabHit = ExtractFileName(input);
-			string AdditionalPath = SeperatePath(ref tabHit);
+			string additionalPath = SeperatePath(ref tabHit);
 
-			string tabName = GetFile(AdditionalPath, tabHit, index);
+			string tabName = GetFile(additionalPath, tabHit, index);
 
 			return input.Substring(0, input.Length - tabHit.Length) + tabName;
 		}
@@ -69,15 +69,15 @@ namespace CmdHost
 
 		public string SeperatePath(ref string tabHit)
 		{
-			string AdditionalPath = "";
+			string additionalPath = "";
 
 			if (tabHit.LastIndexOf('\\') != -1)
 			{
-				AdditionalPath += tabHit.Substring(0, tabHit.LastIndexOf('\\'));
+				additionalPath += tabHit.Substring(0, tabHit.LastIndexOf('\\'));
 				tabHit = tabHit.Substring(tabHit.LastIndexOf('\\') + 1);
 			}
 
-			return AdditionalPath;
+			return additionalPath;
 		}
 
 		public string ExtractFileName(string input)

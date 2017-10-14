@@ -10,12 +10,12 @@ namespace UnitTest
 	[STATestClass]
 	public class TerminalTest
 	{
-		private Terminal t;
+		private TerminalContentMgr t;
 
 		[TestInitialize]
 		public void Init()
 		{
-			t = new Terminal(new TextBoxMock());
+			t = new TerminalContentMgr(new TextBoxMock());
 		}
 
 		[TestMethod]

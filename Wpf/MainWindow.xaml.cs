@@ -9,9 +9,9 @@ using Microsoft.Win32;
 
 namespace Wpf
 {
-	public partial class MainWindow : Window, UI
+	public partial class MainWindow : Window, ITerminalBoxProvider
 	{
-		private readonly Controller controller;
+		private readonly TerminalController controller;
 
 		public MainWindow()
 		{
@@ -19,7 +19,7 @@ namespace Wpf
 
 			Rst.BorderThickness = new Thickness(0, 0, 0, 0);
 
-			controller = new Controller(this);
+			controller = new TerminalController(this);
 		}
 
 		private void OnLoad(object sender, EventArgs e)

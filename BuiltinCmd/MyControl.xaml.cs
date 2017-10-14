@@ -15,9 +15,9 @@ namespace BuiltinCmd
 	/// <summary>
 	/// Interaction logic for MyControl.xaml
 	/// </summary>
-	public partial class MyControl : UserControl, UI
+	public partial class MyControl : UserControl, ITerminalBoxProvider
 	{
-		private readonly Controller controller;
+		private readonly TerminalController terminalController;
 
 		public MyControl()
 		{
@@ -27,35 +27,35 @@ namespace BuiltinCmd
 			Rst.UndoLimit = 100;
 			Rst.Focus();
 
-			controller = new Controller(this);
+			terminalController = new TerminalController(this);
 		}
 
-		private DTE2 Dte;
+		private DTE2 dte;
 		private Events2 events;
 		private DTEEvents dteEvents;
 		private SolutionEvents solutionEvents;
 
-		private bool FirstRun = true;
+		private bool firstRun = true;
 
 		private void OnLoad(object sender, EventArgs e)
 		{
-			if (!FirstRun)
+			if (!firstRun)
 			{
 				return;
 			}
 
-			FirstRun = false;
+			firstRun = false;
 
 			Init();
 		}
 
 		private void Init()
 		{
-			Dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
+			dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
 
-			if (Dte != null)
+			if (dte != null)
 			{
-				events = Dte.Events as Events2;
+				events = dte.Events as Events2;
 				if (events != null)
 				{
 					dteEvents = events.DTEEvents;
@@ -65,27 +65,27 @@ namespace BuiltinCmd
 				}
 			}
 
-			controller.setShell(optionMgr.Shell);
+			terminalController.SetShell(optionMgr.Shell);
 
-			controller.Init(GetProjectPath());
+			terminalController.Init(GetProjectPath());
 
-			controller.InvokeCmd("\n[Global Init Script ...]\n", optionMgr.getGlobalScript());
+			terminalController.InvokeCmd("\n[Global Init Script ...]\n", optionMgr.getGlobalScript());
 		}
 
 		private void SwitchStartupDir(string msg)
 		{
 			var dir = GetProjectPath();
-			controller.setPath(dir);
-			controller.InvokeCmd(msg, optionMgr.cdPrefix() + dir);
+			terminalController.SetPath(dir);
+			terminalController.InvokeCmd(msg, optionMgr.cdPrefix() + dir);
 
 			System.Threading.Thread.Sleep(200); //Wait dir changed
 			
-			controller.InvokeCmd("\n[Project Init Script ...]\n", optionMgr.getProjectScript());
+			terminalController.InvokeCmd("\n[Project Init Script ...]\n", optionMgr.getProjectScript());
 		}
 
 		private string GetProjectPath()
 		{
-			string path = Dte.Solution.FileName;
+			string path = dte.Solution.FileName;
 			if (string.IsNullOrEmpty(path))
 			{
 				return "c:\\";
@@ -98,13 +98,13 @@ namespace BuiltinCmd
 
 		private void OnClear(object sender, EventArgs e)
 		{
-			controller.ClearOutput();
+			terminalController.ClearOutput();
 		}
 
 		private void OnRestart(object sender, EventArgs e)
 		{
-			controller.setShell(optionMgr.Shell);
-			controller.RestartProc();
+			terminalController.SetShell(optionMgr.Shell);
+			terminalController.RestartProc();
 		}
 
 		private void OnSave(object sender, EventArgs e)
@@ -141,7 +141,7 @@ namespace BuiltinCmd
 
 		private void ShutDown()
 		{
-			controller.Close();
+			terminalController.Close();
 		}
 
 		public TextBox GetTextBox()

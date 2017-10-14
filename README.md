@@ -3,7 +3,7 @@
 [![AppVeyor](https://img.shields.io/appveyor/ci/lkytal/builtincmd.svg?style=flat-square)](https://ci.appveyor.com/project/lkytal/builtincmd)
 <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noreferrer noopener"><img src="https://img.shields.io/badge/License-CC_BY--SA_4.0-5E81AC.png?style=flat-square"></a>
 
-Integrate windows _cmd_ terminal or powershell into Visual Studio.
+Integrate windows _cmd_ terminal or PowerShell into Visual Studio.
 
 *You can open it via "view -> other window -> Toggle BuiltinCmd" or just press `Ctrl + Shift + T` to show it.*
 
@@ -11,8 +11,8 @@ Support from VS2013 to VS2017.
 
 ## Highlights
 - Support switching within command histories by arrow keys.
-- Support auto completion with _Tab_ key.
-- Support _Ctrl + C_ to terminal.
+- Support autocompletion with the _Tab_ key.
+- Support _Ctrl + C_ to terminate.
 - Support Powershell.
 - Support startup commands.
 
@@ -26,22 +26,25 @@ Let me know if you have any questions or suggestions.
 
 ## Update log
 
-- 2.0.0: Support powershell; support startup commands.
+- 2.0.0: Support PowerShell; support startup commands.
 - 1.9.6: Detect white space correctly.
 - 1.9.5: Refine key handling.
-- 1.9.4: Better caret color when using dark theme.
-- 1.9.2: Project dir supported.
-- 1.9.1: Fix up tab complete position.
-- 1.9.0: Better performance.
-- 1.8.0: Support VS2017.
-- 1.7.0: Auto completion with tab key.
-- 1.6.1: Fix dispose on shutdown.
-- 1.5.1: Fix for vs2013.
-- 1.5.0: Experimental support for VS2017.
-- 1.4.0: Native look as command prompt.
-- 1.3.2: Fixup scrollToend.
+1.9.4: Better caret color when using the dark theme.
+1.9.3: Clean up code, new menu icon.
+1.9.2: Start with project dir.
+1.9.1: Fix tab complete position.
+1.9.0: Better performance.
+1.8.0: Support VS2017.
+1.7.2: Support Ctrl + C.
+1.7.1: Fixed autocompletion with different dir.
+1.7.0: Autocompletion with the tab key.
+1.6.1: Fix dispose on shutdown.
+1.5.1: Fix for vs2013.
+1.5.0: Experiment support for VS15.
+1.4.0: Native look as the command prompt.
+1.3.2: Fixup ScrollToEnd.
 
-## My Other Extentions
+## My Other Extensions
 
 - ### [SmoothScroll](https://marketplace.visualstudio.com/items?itemName=lkytal.SmoothScroll)
 - ### [StatusInfo](https://marketplace.visualstudio.com/items?itemName=lkytal.StatusInfo)
