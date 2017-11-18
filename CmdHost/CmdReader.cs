@@ -19,7 +19,8 @@ namespace CmdHost
 		private readonly List<ICmdReceiver> receivers = new List<ICmdReceiver>();
 		private Process cmdProc;
 		private Task outputTask, errorTask;
-		private CancellationTokenSource cancelToken;
+		private CancellationTokenSource cancelSource;
+		private bool running = false;
 
 		public string InitDir { get; set; }
 		public string Shell { get; set; } = "Cmd.exe";
@@ -31,16 +32,16 @@ namespace CmdHost
 
 		public bool Init()
 		{
-			cancelToken = new CancellationTokenSource();
+			cancelSource = new CancellationTokenSource();
 
 			if ((cmdProc = CreateProc()) == null)
 			{
 				return false;
 			}
 
-			outputTask = new Task(() => ReadRoutine(cmdProc.StandardOutput, cancelToken));
+			outputTask = new Task(() => ReadRoutine(cmdProc.StandardOutput, cancelSource.Token), cancelSource.Token);
 			outputTask.Start();
-			errorTask = new Task(() => ReadRoutine(cmdProc.StandardError, cancelToken));
+			errorTask = new Task(() => ReadRoutine(cmdProc.StandardError, cancelSource.Token), cancelSource.Token);
 			errorTask.Start();
 
 			cmdProc.EnableRaisingEvents = true;
@@ -50,6 +51,8 @@ namespace CmdHost
 				Close();
 				Init();
 			};
+
+			running = true;
 
 			return true;
 		}
@@ -73,7 +76,7 @@ namespace CmdHost
 			return Process.Start(proArgs);
 		}
 
-		private void ReadRoutine(StreamReader output, CancellationTokenSource cancelToken)
+		private void ReadRoutine(StreamReader output, CancellationToken cancelToken)
 		{
 			char[] data = new char[4096];
 
@@ -107,20 +110,25 @@ namespace CmdHost
 
 		public void Close()
 		{
+			if (!running)
+			{
+				return;
+			}
+
+			cancelSource?.Cancel();
+
 			if (cmdProc != null && !cmdProc.HasExited)
 			{
 				cmdProc.EnableRaisingEvents = false;
 				cmdProc.Kill();
 			}
 
-			if (cancelToken != null && !cancelToken.IsCancellationRequested)
-			{
-				cancelToken.Cancel();
-				outputTask?.Wait(100);
-				errorTask?.Wait(100);
+			outputTask?.Wait(100);
+			errorTask?.Wait(100);
 
-				cancelToken.Dispose();
-			}
+			cancelSource?.Dispose();
+
+			running = false;
 		}
 
 		public void Input(string text)
