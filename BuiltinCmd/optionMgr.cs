@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,23 +6,23 @@ using System.Threading.Tasks;
 
 namespace BuiltinCmd
 {
-	static class optionMgr
+	static class OptionMgr
 	{
-		static public string getGlobalScript()
+		public static string GetGlobalScript()
 		{
-			return BuiltinCmdPackage.OptionsPage?.initScript ?? "";
+			return BuiltinCmdPackage.OptionsPage?.InitScript ?? "";
 		}
 
-		static public string getProjectScript()
+		public static string GetProjectScript()
 		{
-			return BuiltinCmdPackage.OptionsPage?.projectInitScript ?? "";
+			return BuiltinCmdPackage.OptionsPage?.ProjectInitScript ?? "";
 		}
 
-		static public bool usePS => BuiltinCmdPackage.OptionsPage?.usePS ?? false;
+		public static bool UsePowerShell => BuiltinCmdPackage.OptionsPage?.UsePs ?? false;
 
-		static public string cdPrefix()
+		public static string CdPrefix()
 		{
-			if (usePS)
+			if (UsePowerShell)
 			{
 				return "cd ";
 			}
@@ -30,11 +30,11 @@ namespace BuiltinCmd
 			return "cd /d ";
 		}
 
-		static public string Shell
+		public static string Shell
 		{
 			get
 			{
-				if (usePS)
+				if (UsePowerShell)
 				{
 					return "powershell.exe";
 				}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -64,7 +64,7 @@ namespace UnitTest
 		[DataRow(@"PS D:\0\Deploy_lky 2017-09-11 21_02_05\Out\TestDir>")]
 		public void TestExtractPsDir(string value)
 		{
-			string dir = value.Substring(value.LastIndexOf("PS ") + 3);
+			string dir = value.Substring(value.LastIndexOf("PS ", StringComparison.Ordinal) + 3);
 			dir = dir.Remove(dir.Length - 1);
 
 			t.ExtractDir(value);

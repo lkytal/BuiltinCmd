@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -65,22 +65,22 @@ namespace BuiltinCmd
 				}
 			}
 
-			terminalController.SetShell(optionMgr.Shell);
+			terminalController.SetShell(OptionMgr.Shell);
 
 			terminalController.Init(GetProjectPath());
 
-			terminalController.InvokeCmd("\n[Global Init Script ...]\n", optionMgr.getGlobalScript());
+			terminalController.InvokeCmd("\n[Global Init Script ...]\n", OptionMgr.GetGlobalScript());
 		}
 
 		private void SwitchStartupDir(string msg)
 		{
 			var dir = GetProjectPath();
 			terminalController.SetPath(dir);
-			terminalController.InvokeCmd(msg, optionMgr.cdPrefix() + dir);
+			terminalController.InvokeCmd(msg, OptionMgr.CdPrefix() + dir);
 
 			System.Threading.Thread.Sleep(200); //Wait dir changed
-			
-			terminalController.InvokeCmd("\n[Project Init Script ...]\n", optionMgr.getProjectScript());
+
+			terminalController.InvokeCmd("\n[Project Init Script ...]\n", OptionMgr.GetProjectScript());
 		}
 
 		private string GetProjectPath()
@@ -103,7 +103,7 @@ namespace BuiltinCmd
 
 		private void OnRestart(object sender, EventArgs e)
 		{
-			terminalController.SetShell(optionMgr.Shell);
+			terminalController.SetShell(OptionMgr.Shell);
 			terminalController.RestartProc();
 		}
 

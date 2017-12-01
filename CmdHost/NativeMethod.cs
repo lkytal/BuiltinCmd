@@ -17,13 +17,13 @@ namespace CmdHost
 			CTRL_SHUTDOWN_EVENT
 		}
 
-		private delegate bool ConsoleCtrlDelegate(CtrlTypes CtrlType);
+		private delegate bool ConsoleCtrlDelegate(CtrlTypes ctrlType);
 
 		[DllImport("kernel32.dll", SetLastError = true)]
 		private static extern bool AttachConsole(uint dwProcessId);
 
 		[DllImport("kernel32.dll", SetLastError = true)]
-		private static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate Handler, bool Add);
+		private static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate handler, bool add);
 
 		[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
 		private static extern bool FreeConsole();

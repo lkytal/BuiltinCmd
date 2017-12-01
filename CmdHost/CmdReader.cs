@@ -88,10 +88,9 @@ namespace CmdHost
 				{
 					int len = output.Read(data, 0, 4096);
 
-					StringBuilder str = new StringBuilder();
-					str.Append(data, 0, len);
+					string str = new string(data, 0, len);
 
-					Notify(str.ToString());
+					Notify(str);
 				}
 				catch (Exception)
 				{

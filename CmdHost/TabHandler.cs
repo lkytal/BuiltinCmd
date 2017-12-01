@@ -98,7 +98,7 @@ namespace CmdHost
 			string lastLine = outputs.Substring(outputs.LastIndexOf('\n') + 1);
 			string dir = Regex.Match(lastLine, regex, RegexOptions.Compiled).Value;
 
-			if (!String.IsNullOrEmpty(dir))
+			if (!string.IsNullOrEmpty(dir))
 			{
 				Dir = dir;
 			}
