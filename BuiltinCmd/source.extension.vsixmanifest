@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 	<Metadata>
-		<Identity Id="5f1a1460-a418-4fae-9cad-ff1c76b7aed9" Version="2.0.1" Language="en-US" Publisher="Lkytal" />
+		<Identity Id="5f1a1460-a418-4fae-9cad-ff1c76b7aed9" Version="2.0.2" Language="en-US" Publisher="Lkytal" />
 		<DisplayName>BuiltinCmd</DisplayName>
 		<Description xml:space="preserve">Integrate CMD Terminal into VS2013, VS2015 or VS2017</Description>
 		<License>LICENSE.txt</License>

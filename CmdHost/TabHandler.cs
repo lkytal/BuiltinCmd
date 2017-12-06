@@ -5,16 +5,22 @@ using System.Text.RegularExpressions;
 
 namespace CmdHost
 {
+	public interface ITerminalContentMgr
+	{
+		void SetInput(string input);
+		string GetInput();
+	}
+
 	public class TabHandler
 	{
-		private readonly TerminalContentMgr terminal;
+		private readonly ITerminalContentMgr terminal;
 
 		private int TabIndex { get; set; } = 0;
 		public string Dir { get; private set; } = "";
 
-		public TabHandler(TerminalContentMgr terminal)
+		public TabHandler(ITerminalContentMgr _terminal)
 		{
-			this.terminal = terminal;
+			this.terminal = _terminal;
 		}
 
 		public void ResetTabComplete()

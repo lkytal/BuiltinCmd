@@ -26,6 +26,7 @@ Let me know if you have any questions or suggestions.
 
 ## Update log
 
+- 2.0.2: Some refact.
 - 2.0.1: Correct cancellation.
 - 2.0.0: Support PowerShell; support startup commands.
 - 1.9.6: Detect white space correctly.

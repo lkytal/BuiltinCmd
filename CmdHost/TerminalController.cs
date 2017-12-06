@@ -12,7 +12,7 @@ namespace CmdHost
 		TextBox GetTextBox();
 	}
 
-	public class TerminalController : ICmdReceiver, ITextBoxSource
+	public class TerminalController : ICmdReceiver, ITextBoxSource, ITerminalContentMgr
 	{
 		private readonly ITerminalBoxProvider mainWindow;
 		private readonly HistoryCommand historyCommand;
@@ -34,7 +34,7 @@ namespace CmdHost
 			cmdReader.Register(this);
 
 			terminalContentMgr = new TerminalContentMgr(this);
-			tabHandler = new TabHandler(terminalContentMgr);
+			tabHandler = new TabHandler(this);
 		}
 
 		public void Init(string projectPath = null)
@@ -83,7 +83,7 @@ namespace CmdHost
 		{
 			string cmd = terminalContentMgr.GetCmd();
 
-			if (cmd == "cls")
+			if (cmd == @"cls")
 			{
 				mainWindow.Dispatcher.Invoke(() =>
 				{
@@ -225,6 +225,16 @@ namespace CmdHost
 		public TextBox GetTextBox()
 		{
 			return mainWindow.GetTextBox();
+		}
+
+		public void SetInput(string input)
+		{
+			terminalContentMgr.SetInput(input);
+		}
+
+		public string GetInput()
+		{
+			return terminalContentMgr.GetInput();
 		}
 	}
 }

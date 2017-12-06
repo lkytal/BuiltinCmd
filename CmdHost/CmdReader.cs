@@ -122,8 +122,8 @@ namespace CmdHost
 				cmdProc.Kill();
 			}
 
-			outputTask?.Wait(100);
-			errorTask?.Wait(100);
+			//outputTask?.Wait(100);
+			//errorTask?.Wait(100);
 
 			cancelSource?.Dispose();
 
