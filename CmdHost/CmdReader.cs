@@ -78,7 +78,7 @@ namespace CmdHost
 
 		private void ReadRoutine(StreamReader output, CancellationToken cancelToken)
 		{
-			char[] data = new char[4096];
+			var data = new char[4096];
 
 			while (!cancelToken.IsCancellationRequested)
 			{
@@ -94,7 +94,7 @@ namespace CmdHost
 				}
 				catch (Exception)
 				{
-					return; //Process terminated
+					break; //Process terminated
 				}
 			}
 		}

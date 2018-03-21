@@ -9,6 +9,8 @@ using EnvDTE;
 using EnvDTE80;
 using Package = Microsoft.VisualStudio.Shell.Package;
 using CmdHost;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace BuiltinCmd
 {
@@ -67,7 +69,18 @@ namespace BuiltinCmd
 
 			terminalController.SetShell(OptionMgr.Shell);
 
-			terminalController.Init(GetProjectPath());
+			var createSuccess = terminalController.Init(GetProjectPath());
+
+			if (!createSuccess)
+			{
+				VsShellUtilities.ShowMessageBox(
+					ServiceProvider.GlobalProvider,
+					"Can not create console process, check your configuration and reopen this window",
+					"Can not create process",
+					OLEMSGICON.OLEMSGICON_CRITICAL,
+					OLEMSGBUTTON.OLEMSGBUTTON_OK,
+					OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+			}
 
 			terminalController.InvokeCmd("\n[Global Init Script ...]\n", OptionMgr.GetGlobalScript());
 		}

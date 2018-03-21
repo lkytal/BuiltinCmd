@@ -37,10 +37,11 @@ namespace CmdHost
 			tabHandler = new TabHandler(this);
 		}
 
-		public void Init(string projectPath = null)
+		public bool Init(string projectPath = null)
 		{
 			cmdReader.InitDir = projectPath;
-			cmdReader.Init();
+
+			return cmdReader.Init();
 		}
 
 		public void SetPath(string projectPath)
