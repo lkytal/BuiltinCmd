@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.IO;
+using System.Windows.Media;
 using Microsoft.Win32;
 using EnvDTE;
 using EnvDTE80;
@@ -27,6 +28,7 @@ namespace BuiltinCmd
 
 			Rst.BorderThickness = new Thickness(0, 0, 0, 0);
 			Rst.UndoLimit = 100;
+			Rst.FontFamily = new FontFamily(OptionMgr.Font);
 			Rst.Focus();
 
 			terminalController = new TerminalController(this);

@@ -18,6 +18,8 @@ namespace BuiltinCmd
 			return BuiltinCmdPackage.OptionsPage?.ProjectInitScript ?? "";
 		}
 
+		public static string Font => BuiltinCmdPackage.OptionsPage?.Font ?? "Consolas";
+
 		public static bool UsePowerShell => BuiltinCmdPackage.OptionsPage?.UsePs ?? false;
 
 		public static string CdPrefix()
