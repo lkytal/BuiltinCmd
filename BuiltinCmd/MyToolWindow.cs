@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Windows;
+﻿using Microsoft.VisualStudio.Shell;
+
+using System;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell;
-//using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BuiltinCmd
 {
@@ -43,30 +36,6 @@ namespace BuiltinCmd
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
             base.Content = new MyControl();
-        }
-    }
-
-    public class MyToolWindowPackage : AsyncPackage
-    {
-        public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            if (toolWindowType == typeof(MyToolWindow).GUID)
-            {
-                return this;
-            }
-
-            return base.GetAsyncToolWindowFactory(toolWindowType);
-        }
-
-        protected override string GetToolWindowTitle(Type toolWindowType, int id)
-        {
-            if(toolWindowType == typeof(MyToolWindow))
-            {
-                return "Tool window loading...";
-            }
-
-            return base.GetToolWindowTitle(toolWindowType, id);
         }
     }
 }
