@@ -7,6 +7,8 @@ using System.Windows;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+//using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace BuiltinCmd
 {
@@ -25,8 +27,7 @@ namespace BuiltinCmd
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
-        public MyToolWindow() :
-            base(null)
+        public MyToolWindow() : base(null)
         {
             // Set the window title reading it from the resources.
             this.Caption = Resources.ToolWindowTitle;
@@ -42,6 +43,30 @@ namespace BuiltinCmd
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
             base.Content = new MyControl();
+        }
+    }
+
+    public class MyToolWindowPackage : AsyncPackage
+    {
+        public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (toolWindowType == typeof(MyToolWindow).GUID)
+            {
+                return this;
+            }
+
+            return base.GetAsyncToolWindowFactory(toolWindowType);
+        }
+
+        protected override string GetToolWindowTitle(Type toolWindowType, int id)
+        {
+            if(toolWindowType == typeof(MyToolWindow))
+            {
+                return "Tool window loading...";
+            }
+
+            return base.GetToolWindowTitle(toolWindowType, id);
         }
     }
 }
