@@ -54,7 +54,7 @@ namespace CmdHost
 
 		public string GetFile(string additionalPath, string tabHit, int index)
 		{
-            string[] files = Directory.GetFileSystemEntries(Dir + "\\" + additionalPath, tabHit + "*");
+			var files = Directory.GetFileSystemEntries(Dir + "\\" + additionalPath, tabHit + "*");
 
 			if (files.Length == 0)
 			{

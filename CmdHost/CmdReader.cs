@@ -78,7 +78,7 @@ namespace CmdHost
 
 		private void ReadRoutine(StreamReader output, CancellationToken cancelToken)
 		{
-            char[] data = new char[4096];
+			var data = new char[4096];
 
 			while (!cancelToken.IsCancellationRequested)
 			{
@@ -101,7 +101,7 @@ namespace CmdHost
 
 		public void Notify(string data)
 		{
-			foreach (ICmdReceiver receiver in receivers)
+			foreach (var receiver in receivers)
 			{
 				receiver.AddData(data);
 			}
