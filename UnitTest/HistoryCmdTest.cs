@@ -27,22 +27,22 @@ namespace UnitTest
 		[TestMethod]
 		public void TestUp()
 		{
-			Assert.AreEqual(h.SelectPreviuos(), "333");
+			Assert.AreEqual(h.SelectPrevious(), "333");
 
-			Assert.AreEqual(h.SelectPreviuos(), "222");
+			Assert.AreEqual(h.SelectPrevious(), "222");
 
-			Assert.AreEqual(h.SelectPreviuos(), "11");
+			Assert.AreEqual(h.SelectPrevious(), "11");
 
-			Assert.AreEqual(h.SelectPreviuos(), null);
+			Assert.AreEqual(h.SelectPrevious(), null);
 		}
 
 		[TestMethod]
 		public void TestDown()
 		{
-			h.SelectPreviuos();
-			h.SelectPreviuos();
-			h.SelectPreviuos();
-			h.SelectPreviuos();
+			h.SelectPrevious();
+			h.SelectPrevious();
+			h.SelectPrevious();
+			h.SelectPrevious();
 
 			Assert.AreEqual(h.SelectNext(), "222");
 
@@ -54,9 +54,9 @@ namespace UnitTest
 		[TestMethod]
 		public void TestUpAndDown()
 		{
-			Assert.AreEqual(h.SelectPreviuos(), "333");
+			Assert.AreEqual(h.SelectPrevious(), "333");
 
-			Assert.AreEqual(h.SelectPreviuos(), "222");
+			Assert.AreEqual(h.SelectPrevious(), "222");
 
 			Assert.AreEqual(h.SelectNext(), "333");
 		}

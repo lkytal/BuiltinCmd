@@ -17,9 +17,14 @@ namespace BuiltinCmd
 		public bool UsePs { get; set; } = false;
 
 		[Category("General")]
-		[Description("Terminal Font to Use.")]
+		[Description("Terminal Font to Use, restart shell to take effect.")]
 		[DisplayName("Terminal Font")]
 		public string Font { get; set; } = "Consolas";
+
+		[Category("General")]
+		[Description("Terminal Font Size, restart shell to take effect.")]
+		[DisplayName("Terminal Font Size")]
+		public int FontSize { get; set; } = 10;
 
 		[Category("Parameter")]
 		[Description("Global Startup Commands, execute when VS started.")]

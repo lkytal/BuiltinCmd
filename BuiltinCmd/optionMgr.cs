@@ -20,6 +20,8 @@ namespace BuiltinCmd
 
 		public static string Font => BuiltinCmdPackage.OptionsPage?.Font ?? "Consolas";
 
+		public static int FontSize => BuiltinCmdPackage.OptionsPage?.FontSize ?? 10;
+
 		public static bool UsePowerShell => BuiltinCmdPackage.OptionsPage?.UsePs ?? false;
 
 		public static string CdPrefix()

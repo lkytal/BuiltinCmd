@@ -39,7 +39,7 @@ namespace CmdHost
 			return GetItem(Index);
 		}
 
-		public string SelectPreviuos()
+		public string SelectPrevious()
 		{
 			if (Index >= 1)
 			{

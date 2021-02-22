@@ -169,7 +169,7 @@ namespace CmdHost
 			switch (e.Key)
 			{
 				case Key.Up:
-					terminalContentMgr.SetInput(historyCommand.SelectPreviuos());
+					terminalContentMgr.SetInput(historyCommand.SelectPrevious());
 					break;
 
 				case Key.Down:

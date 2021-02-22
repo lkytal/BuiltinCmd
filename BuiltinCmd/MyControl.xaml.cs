@@ -29,6 +29,7 @@ namespace BuiltinCmd
 			Rst.BorderThickness = new Thickness(0, 0, 0, 0);
 			Rst.UndoLimit = 100;
 			Rst.FontFamily = new FontFamily(OptionMgr.Font);
+			Rst.FontSize = OptionMgr.FontSize;
 			Rst.Focus();
 
 			terminalController = new TerminalController(this);
