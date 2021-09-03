@@ -44,7 +44,8 @@ namespace BuiltinCmd
 
 		private void OnLoad(object sender, EventArgs e)
 		{
-			if (!firstRun)
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (!firstRun)
 			{
 				return;
 			}
@@ -56,7 +57,8 @@ namespace BuiltinCmd
 
 		private void Init()
 		{
-			dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
+            ThreadHelper.ThrowIfNotOnUIThread();
+            dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
 
 			if (dte != null)
 			{
@@ -72,7 +74,7 @@ namespace BuiltinCmd
 
 			terminalController.SetShell(OptionMgr.Shell);
 
-			var createSuccess = terminalController.Init(GetProjectPath());
+            bool createSuccess = terminalController.Init(GetProjectPath());
 
 			if (!createSuccess)
 			{
@@ -90,7 +92,8 @@ namespace BuiltinCmd
 
 		private void SwitchStartupDir(string msg)
 		{
-			var dir = GetProjectPath();
+            ThreadHelper.ThrowIfNotOnUIThread();
+            string dir = GetProjectPath();
 			terminalController.SetPath(dir);
 			terminalController.InvokeCmd(msg, OptionMgr.CdPrefix() + dir);
 
@@ -101,7 +104,8 @@ namespace BuiltinCmd
 
 		private string GetProjectPath()
 		{
-			string path = dte.Solution.FileName;
+            ThreadHelper.ThrowIfNotOnUIThread();
+            string path = dte.Solution.FileName;
 			if (string.IsNullOrEmpty(path))
 			{
 				return "c:\\";
@@ -152,7 +156,8 @@ namespace BuiltinCmd
 
 		private void OnSwitch(object sender, RoutedEventArgs e)
 		{
-			SwitchStartupDir("\n====== Switch to solution dir ======\n");
+            ThreadHelper.ThrowIfNotOnUIThread();
+            SwitchStartupDir("\n====== Switch to solution dir ======\n");
 		}
 
 		private void ShutDown()
