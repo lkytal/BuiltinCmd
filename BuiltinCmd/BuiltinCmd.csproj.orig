@@ -11,6 +11,10 @@
     <AssemblyVersionSettings>None.None.None.Increment</AssemblyVersionSettings>
     <AssemblyFileVersionSettings>None.None.None.Increment</AssemblyFileVersionSettings>
     <AssemblyInfoVersionSettings>None.None.None.Increment</AssemblyInfoVersionSettings>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>12.0</OldToolsVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -157,20 +161,31 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.GraphModel">
-      <Version>16.10.31320.204</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>16.10.31321.278</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading">
-      <Version>16.10.56</Version>
-    </PackageReference>
+<<<<<<< HEAD
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
-      <Version>16.10.1055</Version>
+      <Version>16.10.10</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="VSSDK.DTE.8">
+      <Version>8.0.4</Version>
+    </PackageReference>
+    <PackageReference Include="VSSDK.GraphModel">
+      <Version>12.0.4</Version>
+    </PackageReference>
+    <PackageReference Include="VSSDK.Shell.12">
+      <Version>12.0.4</Version>
+    </PackageReference>
+=======
+    <PackageReference Include="Microsoft.VisualStudio.SDK">
+      <Version>16.0.202</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools">
+      <Version>16.3.2099</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+>>>>>>> 3d3aa1da16184cff5119e47607bee23a755937c5
   </ItemGroup>
   <Import Project="..\CmdHost\CmdHost.projitems" Label="Shared" />
   <PropertyGroup>
